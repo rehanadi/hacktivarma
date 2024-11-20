@@ -61,3 +61,21 @@ func (uc *UserController) RegisterUser(name, email, password string, currentUser
 	fmt.Println("User Created")
 	return nil
 }
+
+func (uc *UserController) DeleteUserById(userId string) {
+	err := uc.UserService.DeleteUserById(userId)
+
+	if err != nil {
+		fmt.Println("Error delete user :", err)
+		return
+	}
+}
+
+func (uc *UserController) UpdateUserEmailById(userId, updatedEmail string) {
+	err := uc.UserService.UpdateUserEmailById(userId, updatedEmail)
+	if err != nil {
+		fmt.Println("Error update email :", err)
+		return
+	}
+	fmt.Println("Update success :", userId, updatedEmail)
+}

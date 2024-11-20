@@ -119,3 +119,61 @@ func (s *UserService) RegisterUser(name, email, password string, currentUser ent
 	fmt.Printf("User Created : %s\n", email)
 	return nil
 }
+
+func (s *UserService) DeleteUserById(userId string) error {
+
+	var user entity.User
+
+	query := "SELECT id, name, role, email, password, created_at FROM users WHERE id = $1"
+
+	err := s.DB.QueryRow(query, userId).Scan(
+		&user.Id,
+		&user.Name,
+		&user.Role,
+		&user.Email,
+		&user.Password,
+		&user.CreatedAt,
+	)
+
+	if err != nil {
+		fmt.Printf("User with ID : %s not found\n", userId)
+		return errors.New("user not found")
+	}
+
+	updateQuery := "DELETE FROM users WHERE id = $1"
+	_, err = s.DB.Exec(updateQuery, userId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *UserService) UpdateUserEmailById(userId string, updatedEmail string) error {
+
+	var user entity.User
+
+	query := "SELECT id, name, role, email, password, created_at FROM users WHERE id = $1"
+
+	err := s.DB.QueryRow(query, userId).Scan(
+		&user.Id,
+		&user.Name,
+		&user.Role,
+		&user.Email,
+		&user.Password,
+		&user.CreatedAt,
+	)
+
+	if err != nil {
+		fmt.Printf("User with ID : %s not found\n", userId)
+		return errors.New("user not found")
+	}
+
+	updateQuery := "UPDATE users SET email = $1 WHERE id = $2"
+	_, err = s.DB.Exec(updateQuery, updatedEmail, userId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
