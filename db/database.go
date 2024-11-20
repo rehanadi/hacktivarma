@@ -9,7 +9,7 @@ import (
 
 func Connect() *sql.DB {
 
-	databaseName := "phar1"
+	databaseName := "hacktivarma"
 	dsn := fmt.Sprintf("root:@tcp(127.0.0.1:3306)/%s?parseTime=true", databaseName)
 	DB, err := sql.Open("mysql", dsn)
 
