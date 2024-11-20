@@ -74,7 +74,7 @@ func (uc *UserController) DeleteUserById(userId string) {
 func (uc *UserController) UpdateUserEmailById(userId, updatedEmail string) {
 	err := uc.UserService.UpdateUserEmailById(userId, updatedEmail)
 	if err != nil {
-		fmt.Println("Error update stock :", err)
+		fmt.Println("Error update email :", err)
 		return
 	}
 	fmt.Println("Update success :", userId, updatedEmail)
