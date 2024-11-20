@@ -61,7 +61,7 @@ func (s *UserService) UserLogin(email, password string) (*entity.User, error) {
 
 	var user entity.User
 
-	query := "SELECT id, name, role, email, password, created_at FROM users WHERE email = ?"
+	query := "SELECT id, name, role, email, password, created_at FROM users WHERE email = $1"
 
 	err := s.DB.QueryRow(query, email).Scan(
 		&user.Id,
@@ -87,7 +87,7 @@ func (s *UserService) RegisterUser(name, email, password string, currentUser ent
 
 	var user entity.User
 
-	query := "SELECT id, name, role, email, password, created_at FROM users WHERE email = ?"
+	query := "SELECT id, name, role, email, password, created_at FROM users WHERE email = $1"
 
 	err := s.DB.QueryRow(query, email).Scan(
 		&user.Id,
@@ -103,13 +103,13 @@ func (s *UserService) RegisterUser(name, email, password string, currentUser ent
 	}
 
 	if currentUser.Role == "employee" {
-		insertQuery := "INSERT INTO USERS (name, role, email, password) VALUES (?, ?, ?, ?)"
+		insertQuery := "INSERT INTO USERS (name, role, email, password) VALUES ($1, $2, $3, $4)"
 		_, err = s.DB.Exec(insertQuery, name, currentUser.Role, email, password)
 		if err != nil {
 			return err
 		}
 	} else {
-		insertQuery := "INSERT INTO USERS (name, email, password) VALUES (?, ?, ?)"
+		insertQuery := "INSERT INTO USERS (name, email, password) VALUES ($1, $2, $3)"
 		_, err = s.DB.Exec(insertQuery, name, email, password)
 		if err != nil {
 			return err

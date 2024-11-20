@@ -1,5 +1,5 @@
 CREATE TABLE users (
-    id char(8) default (SUBSTRING( REPLACE(UUID(), '-', ''), 1, 8)),
+    id char(8) default (SUBSTRING( REPLACE(uuid_generate_v4()::text, '-', ''), 1, 8)),
     name VARCHAR(255) not null,
     role VARCHAR(255) default 'customer',
     email VARCHAR(255) not null,

@@ -4,19 +4,24 @@ import (
 	"database/sql"
 	"fmt"
 
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 )
 
 func Connect() *sql.DB {
 
-	databaseName := "hacktivarma"
-	dsn := fmt.Sprintf("root:@tcp(127.0.0.1:3306)/%s?parseTime=true", databaseName)
-	DB, err := sql.Open("mysql", dsn)
+	db_name := ""
+	db_host := ""
+	db_port := ""
+	db_user := ""
+	db_pass := ""
+
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=require", db_host, db_port, db_user, db_pass, db_name)
+	DB, err := sql.Open("postgres", dsn)
 
 	if err != nil {
 		fmt.Println("Database connection failed :", err)
 	} else {
-		fmt.Println("Connected to MySQL")
+		fmt.Println("Connected to Postgres Database")
 	}
 	return DB
 }

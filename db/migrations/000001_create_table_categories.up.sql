@@ -1,7 +1,6 @@
 CREATE TABLE categories (
-   id INT auto_increment,
-   name VARCHAR(100) NOT NULL,
-   CONSTRAINT pk_categories PRIMARY KEY(id)
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL
 );
 
 INSERT INTO categories (name) VALUES
