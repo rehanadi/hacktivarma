@@ -1,6 +1,8 @@
 package entity
 
-import "time"
+import (
+	"time"
+)
 
 type Order struct {
 	Id             string
@@ -18,4 +20,16 @@ type Order struct {
 	UpdatedAt      time.Time
 	UserName       string
 	DrugName       string
+}
+
+type ReportOrder struct {
+	Date               string
+	TotalOrderAll      int
+	TotalOrderPending  int
+	TotalOrderSuccess  int
+	TotalOrderFailed   int
+	AmountOrderAll     float64
+	AmountOrderPending float64
+	AmountOrderSuccess float64
+	AmountOrderFailed  float64
 }
