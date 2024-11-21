@@ -28,6 +28,7 @@ func showMenuCustomer(currentUser entity.User, uc *users.UserController) {
 	fmt.Printf("101. All Orders (Customer)\n")
 	fmt.Printf("102. Add Order (Customer)\n")
 	fmt.Printf("103. Pay Order (Customer)\n")
+	fmt.Printf("104. Delete Order (Customer)\n")
 
 	screenLine(width)
 
@@ -411,7 +412,7 @@ func main() {
 			}
 
 			if len(orders) == 0 {
-				fmt.Println("No unpaid order")
+				fmt.Println("No unpaid order to pay")
 				continue
 			}
 
@@ -430,6 +431,35 @@ func main() {
 			fmt.Scanln(&inputPaymentAmount)
 
 			orderController.PayOrder(inputOrderID, inputPaymentMethod, inputPaymentAmount, currentUser.Id)
+
+			orderController.GetAllOrders(currentUser.Id)
+
+		case 104:
+			if currentUser.Role != "customer" {
+				fmt.Println("Forbidden!")
+				return
+			}
+			fmt.Println("DELETE ORDER (Customer)")
+
+			orders, err := orderController.GetFailedOrders(currentUser.Id)
+
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+
+			if len(orders) == 0 {
+				fmt.Println("No failed order to delete")
+				continue
+			}
+
+			var inputOrderID string
+
+			fmt.Printf("Enter Order ID : ")
+			scanner.Scan()
+			inputOrderID = scanner.Text()
+
+			orderController.DeleteOrderById(inputOrderID, currentUser.Id)
 
 			orderController.GetAllOrders(currentUser.Id)
 
