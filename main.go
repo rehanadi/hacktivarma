@@ -396,6 +396,32 @@ func main() {
 			}
 			orderController.GetAllOrders(currentUser.Id)
 
+		case 103:
+			if currentUser.Role != "customer" {
+				fmt.Println("Forbidden!")
+				return
+			}
+			fmt.Println("PAY ORDER (Customer)")
+			orderController.GetUnpaidOrders(currentUser.Id)
+
+			var inputOrderID, inputPaymentMethod string
+			var inputPaymentAmount float64
+
+			fmt.Printf("Enter Order ID : ")
+			scanner.Scan()
+			inputOrderID = scanner.Text()
+
+			fmt.Printf("Enter Payment Method : ")
+			scanner.Scan()
+			inputPaymentMethod = scanner.Text()
+
+			fmt.Printf("Enter Payment Amount : ")
+			fmt.Scanln(&inputPaymentAmount)
+
+			orderController.PayOrder(inputOrderID, inputPaymentMethod, inputPaymentAmount, currentUser.Id)
+
+			orderController.GetAllOrders(currentUser.Id)
+
 		case 0:
 			fmt.Printf("\n\tThank You!\n\n")
 		}
