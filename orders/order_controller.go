@@ -2,6 +2,8 @@ package orders
 
 import (
 	"fmt"
+
+	entity "hacktivarma/entities"
 )
 
 type OrderController struct {
@@ -37,4 +39,15 @@ func (oc *OrderController) GetAllOrders(userId interface{}) {
 	}
 
 	screenLine(width)
+}
+
+func (oc *OrderController) AddOrder(newOrder entity.Order) error {
+	err := oc.OrderService.AddOrder(newOrder)
+
+	if err != nil {
+		fmt.Println("Error :", err)
+		return err
+	}
+	fmt.Println("Order Created")
+	return nil
 }
