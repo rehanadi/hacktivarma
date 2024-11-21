@@ -4,10 +4,12 @@ CREATE TABLE users (
     role VARCHAR(255) default 'customer',
     email VARCHAR(255) not null,
     password VARCHAR(255) not null,
+    location INT NOT NULL,
     created_at TIMESTAMP default current_timestamp,
-    CONSTRAINT pk_users primary key(id)
+    CONSTRAINT pk_users PRIMARY KEY(id),
+    CONSTRAINT fk_users_locations FOREIGN KEY(location) REFERENCES locations(id) ON DELETE CASCADE
 );
 
-INSERT INTO users (name, role, email, password) VALUES
-('user1', 'employee', 'user1@mail.com', 'user1pass'),
-('user2', 'employee', 'user2@mail.com', 'user2pass');
+INSERT INTO users (name, role, email, password, location) VALUES
+('user1', 'employee', 'user1@mail.com', 'user1pass', 1),
+('user2', 'employee', 'user2@mail.com', 'user2pass', 1);
