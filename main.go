@@ -8,6 +8,7 @@ import (
 	"runtime"
 	"time"
 
+	"hacktivarma/categories"
 	"hacktivarma/db"
 	"hacktivarma/drugs"
 	entity "hacktivarma/entities"
@@ -97,6 +98,9 @@ func main() {
 	var currentUser entity.User
 
 	db := db.Connect()
+
+	categoryService := categories.NewCategoryService(db)
+	categoryController := categories.NewCategoryController(categoryService)
 
 	drugService := drugs.NewDrugService(db)
 	drugController := drugs.NewDrugController(drugService)
@@ -239,6 +243,8 @@ func main() {
 			if err != nil {
 				fmt.Println("Date error :", err)
 			}
+
+			categoryController.GetAllCategories()
 
 			fmt.Printf("Enter Drug Category : ")
 			fmt.Scanln(&inputDrugCategory)
