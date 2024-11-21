@@ -104,6 +104,26 @@ func (oc *OrderController) GetUndeliveredOrders() (orders []entity.Order, err er
 	return
 }
 
+func (oc *OrderController) GetReportOrders() {
+	width := 80
+	reportOrders, err := oc.OrderService.GetReportOrders()
+	if err != nil {
+		fmt.Println("Error :", err)
+	}
+
+	screenLine(width)
+	fmt.Printf("%-10s | %-15s | %-15s | %-15s | %-15s | %-15s | %-15s | %-15s | %-15s\n",
+		"Date", "Total Order All", "Total Order Pending", "Total Order Success", "Total Order Failed", "Amount Order All", "Amount Order Pending", "Amount Order Success", "Amount Order Failed")
+	screenLine(width)
+
+	for _, reportOrder := range reportOrders {
+		fmt.Printf("%-10s | %-15v | %-15v | %-15v | %-15v | Rp %-12.0f | Rp %-12.0f | Rp %-12.0f | Rp %-12.0f\n",
+			reportOrder.Date, reportOrder.TotalOrderAll, reportOrder.TotalOrderPending, reportOrder.TotalOrderSuccess, reportOrder.TotalOrderFailed, reportOrder.AmountOrderAll*1000, reportOrder.AmountOrderPending*1000, reportOrder.AmountOrderSuccess*1000, reportOrder.AmountOrderFailed*1000)
+	}
+
+	screenLine(width)
+}
+
 func (oc *OrderController) AddOrder(newOrder entity.Order) error {
 	err := oc.OrderService.AddOrder(newOrder)
 
