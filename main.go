@@ -9,10 +9,12 @@ import (
 	"hacktivarma/db"
 	"hacktivarma/drugs"
 	entity "hacktivarma/entities"
+	"hacktivarma/orders"
 	"hacktivarma/users"
 )
 
 func showMenuCustomer(currentUser entity.User, uc *users.UserController) {
+	width := 32
 	user, err := uc.GetUserById(currentUser.Id)
 	if err != nil {
 		fmt.Println(err)
@@ -21,8 +23,15 @@ func showMenuCustomer(currentUser entity.User, uc *users.UserController) {
 	fmt.Printf("Welcome, %-15s %s'\n\n", user.Name, fmt.Sprintf("Role : '"+user.Role))
 	fmt.Printf("1. All Drugs\n")
 
-	fmt.Printf("\n0. Exit \n")
+	screenLine(width)
 
+	fmt.Printf("101. All Orders (Customer)\n")
+	fmt.Printf("102. Add Order (Customer)\n")
+	fmt.Printf("103. Pay Order (Customer)\n")
+
+	screenLine(width)
+
+	fmt.Printf("\n0. Exit \n")
 }
 
 func screenLine(width int) {
@@ -70,6 +79,9 @@ func main() {
 
 	userService := users.NewUserService(db)
 	userController := users.NewUserController(userService)
+
+	orderService := orders.NewOrderService(db)
+	orderController := orders.NewOrderController(orderService)
 
 	var inputMenu int
 	var inputAuth int
@@ -349,6 +361,40 @@ func main() {
 			userController.UpdateUserEmailById(inputUserId, inputUserEmail)
 
 			userController.GetAllUsers()
+
+		case 101:
+			orderController.GetAllOrders(currentUser.Id)
+
+		case 102:
+			if currentUser.Role != "customer" {
+				fmt.Println("Forbidden!")
+				return
+			}
+			fmt.Println("ADD ORDER (Customer)")
+			drugController.GetAllDrugs()
+
+			var inputDrugID string
+			var inputQuantity int
+
+			fmt.Printf("Enter Drug ID : ")
+			scanner.Scan()
+			inputDrugID = scanner.Text()
+
+			fmt.Printf("Enter Quantity : ")
+			fmt.Scanln(&inputQuantity)
+
+			order := entity.Order{
+				UserId:   currentUser.Id,
+				DrugId:   inputDrugID,
+				Quantity: inputQuantity,
+			}
+
+			err := orderController.AddOrder(order)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			orderController.GetAllOrders(currentUser.Id)
 
 		case 0:
 			fmt.Printf("\n\tThank You!\n\n")
