@@ -60,3 +60,12 @@ func (oc *OrderController) PayOrder(orderId string, paymentMethod string, paymen
 	}
 	fmt.Println("Payment success :", orderId)
 }
+
+func (oc *OrderController) DeliverOrder(orderId string) {
+	err := oc.OrderService.DeliverOrder(orderId)
+	if err != nil {
+		fmt.Println("Error deliver order :", err)
+		return
+	}
+	fmt.Println("Deliver success :", orderId)
+}
