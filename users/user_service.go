@@ -93,6 +93,15 @@ func (s *UserService) RegisterUser(name, email, password, userLocation string, c
 	if err != nil {
 		return err
 	}
+
+	var availableLocation entity.Location
+
+	findQuery := "SELECT id, name from locations WHERE id = $1"
+	err = s.DB.QueryRow(findQuery, location).Scan(&availableLocation.Id, &availableLocation.Name)
+	if err != nil {
+		return errors.New("location is unavailable")
+	}
+
 	var user entity.User
 
 	query := "SELECT id, name, role, email, password, created_at FROM users WHERE email = $1"
