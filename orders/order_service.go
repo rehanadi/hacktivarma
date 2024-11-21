@@ -1,4 +1,4 @@
-package drugs
+package orders
 
 import (
 	"database/sql"
@@ -17,178 +17,473 @@ func NewOrderService(db *sql.DB) *OrderService {
 	return &OrderService{DB: db}
 }
 
-func (s *OrderService) GetAllOrders() ([]entity.Order, error) {
-
+func (s *OrderService) GetAllOrders(userId interface{}) ([]entity.Order, error) {
 	var orders []entity.Order
 
-	query := "SELECT id, user_id, drug_id, quantity, price, total_price, payment_method, payment_status, delivery_status, created_at, updated_at FROM orders"
+	query := `
+		SELECT a.id, a.user_id, a.drug_id, a.quantity, a.price, a.total_price,
+					a.payment_method, a.payment_status, a.payment_at, a.delivery_status, a.delivered_at,
+					a.created_at, a.updated_at, b.name user_name, c.name drug_name
+		FROM orders a, users b, drugs c
+		WHERE a.user_id = b.id
+		AND a.drug_id = c.id
+	`
+
+	if userId != nil {
+		query += " AND a.user_id = '" + userId.(string) + "'"
+	}
+
+	query += " ORDER BY a.created_at"
+
 	rows, err := s.DB.Query(query)
 	if err != nil {
 		return nil, err
 	}
 
 	for rows.Next() {
-		var id string
-		var userId int
-		var drugId int
-		var quantity int
-		var price float64
-		var totalPrice float64
-		var paymentMethod string
-		var paymentStatus string
-		var paymentAt time.Time
-		var deliveryStatus string
-		var deliveryAt time.Time
-		var createdAt time.Time
-		var updatedAt time.Time
+		var order entity.Order
+		var paymentMethod *string
+		var paymentAt, deliveredAt *time.Time
 
-		rows.Scan(
-			&id,
-			&userId,
-			&drugId,
-			&quantity,
-			&price,
-			&totalPrice,
+		err := rows.Scan(
+			&order.Id,
+			&order.UserId,
+			&order.DrugId,
+			&order.Quantity,
+			&order.Price,
+			&order.TotalPrice,
 			&paymentMethod,
-			&paymentStatus,
+			&order.PaymentStatus,
 			&paymentAt,
-			&deliveryStatus,
-			&deliveryAt,
-			&createdAt,
-			&updatedAt,
+			&order.DeliveryStatus,
+			&deliveredAt,
+			&order.CreatedAt,
+			&order.UpdatedAt,
+			&order.UserName,
+			&order.DrugName,
 		)
+		if err != nil {
+			return nil, err
+		}
 
-		orders = append(orders, entity.Order{
-			Id:             id,
-			UserId:         userId,
-			DrugId:         drugId,
-			Quantity:       quantity,
-			Price:          price,
-			TotalPrice:     totalPrice,
-			PaymentMethod:  paymentMethod,
-			PaymentStatus:  paymentStatus,
-			PaymentAt:      paymentAt,
-			DeliveryStatus: deliveryStatus,
-			DeliveryAt:     deliveryAt,
-			CreatedAt:      createdAt,
-			UpdatedAt:      updatedAt,
-		})
+		if paymentMethod != nil {
+			order.PaymentMethod = *paymentMethod
+		}
+		if paymentAt != nil {
+			order.PaymentAt = *paymentAt
+		}
+		if deliveredAt != nil {
+			order.DeliveredAt = *deliveredAt
+		}
+
+		orders = append(orders, order)
 	}
 
 	return orders, nil
 }
 
-func (s *OrderService) AddOrder(
-	name string, dose float64, form string, stock int, price float64, expired_date string, category int,
+func (s *OrderService) GetUnpaidOrders(userId string) ([]entity.Order, error) {
+	var orders []entity.Order
+
+	query := `
+		SELECT a.id, a.user_id, a.drug_id, a.quantity, a.price, a.total_price,
+					a.payment_method, a.payment_status, a.payment_at, a.delivery_status, a.delivered_at,
+					a.created_at, a.updated_at, b.name user_name, c.name drug_name
+		FROM orders a, users b, drugs c
+		WHERE a.user_id = b.id
+		AND a.drug_id = c.id
+		AND a.payment_status = 'unpaid'
+		AND a.user_id = $1
+		ORDER BY a.created_at
+	`
+
+	rows, err := s.DB.Query(query, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var order entity.Order
+		var paymentMethod *string
+		var paymentAt, deliveredAt *time.Time
+
+		err := rows.Scan(
+			&order.Id,
+			&order.UserId,
+			&order.DrugId,
+			&order.Quantity,
+			&order.Price,
+			&order.TotalPrice,
+			&paymentMethod,
+			&order.PaymentStatus,
+			&paymentAt,
+			&order.DeliveryStatus,
+			&deliveredAt,
+			&order.CreatedAt,
+			&order.UpdatedAt,
+			&order.UserName,
+			&order.DrugName,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		if paymentMethod != nil {
+			order.PaymentMethod = *paymentMethod
+		}
+		if paymentAt != nil {
+			order.PaymentAt = *paymentAt
+		}
+		if deliveredAt != nil {
+			order.DeliveredAt = *deliveredAt
+		}
+
+		orders = append(orders, order)
+	}
+
+	return orders, nil
+}
+
+func (s *OrderService) GetFailedOrders(userId string) ([]entity.Order, error) {
+	var orders []entity.Order
+
+	query := `
+		SELECT a.id, a.user_id, a.drug_id, a.quantity, a.price, a.total_price,
+					a.payment_method, a.payment_status, a.payment_at, a.delivery_status, a.delivered_at,
+					a.created_at, a.updated_at, b.name user_name, c.name drug_name
+		FROM orders a, users b, drugs c
+		WHERE a.user_id = b.id
+		AND a.drug_id = c.id
+		AND a.payment_status = 'failed'
+		AND a.user_id = $1
+		ORDER BY a.created_at
+	`
+
+	rows, err := s.DB.Query(query, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var order entity.Order
+		var paymentMethod *string
+		var paymentAt, deliveredAt *time.Time
+
+		err := rows.Scan(
+			&order.Id,
+			&order.UserId,
+			&order.DrugId,
+			&order.Quantity,
+			&order.Price,
+			&order.TotalPrice,
+			&paymentMethod,
+			&order.PaymentStatus,
+			&paymentAt,
+			&order.DeliveryStatus,
+			&deliveredAt,
+			&order.CreatedAt,
+			&order.UpdatedAt,
+			&order.UserName,
+			&order.DrugName,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		if paymentMethod != nil {
+			order.PaymentMethod = *paymentMethod
+		}
+		if paymentAt != nil {
+			order.PaymentAt = *paymentAt
+		}
+		if deliveredAt != nil {
+			order.DeliveredAt = *deliveredAt
+		}
+
+		orders = append(orders, order)
+	}
+
+	return orders, nil
+}
+
+func (s *OrderService) GetUndeliveredOrders() ([]entity.Order, error) {
+	var orders []entity.Order
+
+	query := `
+		SELECT a.id, a.user_id, a.drug_id, a.quantity, a.price, a.total_price,
+					a.payment_method, a.payment_status, a.payment_at, a.delivery_status, a.delivered_at,
+					a.created_at, a.updated_at, b.name user_name, c.name drug_name
+		FROM orders a, users b, drugs c
+		WHERE a.user_id = b.id
+		AND a.drug_id = c.id
+		AND a.payment_status = 'paid'
+		and a.delivery_status = 'pending'
+		ORDER BY a.created_at
+	`
+
+	rows, err := s.DB.Query(query)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var order entity.Order
+		var paymentMethod *string
+		var paymentAt, deliveredAt *time.Time
+
+		err := rows.Scan(
+			&order.Id,
+			&order.UserId,
+			&order.DrugId,
+			&order.Quantity,
+			&order.Price,
+			&order.TotalPrice,
+			&paymentMethod,
+			&order.PaymentStatus,
+			&paymentAt,
+			&order.DeliveryStatus,
+			&deliveredAt,
+			&order.CreatedAt,
+			&order.UpdatedAt,
+			&order.UserName,
+			&order.DrugName,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		if paymentMethod != nil {
+			order.PaymentMethod = *paymentMethod
+		}
+		if paymentAt != nil {
+			order.PaymentAt = *paymentAt
+		}
+		if deliveredAt != nil {
+			order.DeliveredAt = *deliveredAt
+		}
+
+		orders = append(orders, order)
+	}
+
+	return orders, nil
+}
+
+func (s *OrderService) GetReportOrders() ([]entity.ReportOrder, error) {
+	var reportOrders []entity.ReportOrder
+
+	query := `
+		SELECT date(a.created_at)::text date,
+					count(a.id) total_order_all,
+					count(case when a.payment_status = 'unpaid' then 1 end) total_order_pending,
+					count(case when a.payment_status = 'paid' then 1 end) total_order_success,
+					count(case when a.payment_status = 'failed' then 1 end) total_order_failed,
+					coalesce(sum(a.total_price), 0) amount_order_all,
+					coalesce(sum(case when a.payment_status = 'unpaid' then a.total_price end), 0) amount_order_pending,
+					coalesce(sum(case when a.payment_status = 'paid' then a.total_price end), 0) amount_order_success,
+					coalesce(sum(case when a.payment_status = 'failed' then a.total_price end), 0) amount_order_failed
+		FROM orders a
+		GROUP BY date(a.created_at)
+		ORDER BY date(a.created_at)
+	`
+
+	rows, err := s.DB.Query(query)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var reportOrder entity.ReportOrder
+
+		err := rows.Scan(
+			&reportOrder.Date,
+			&reportOrder.TotalOrderAll,
+			&reportOrder.TotalOrderPending,
+			&reportOrder.TotalOrderSuccess,
+			&reportOrder.TotalOrderFailed,
+			&reportOrder.AmountOrderAll,
+			&reportOrder.AmountOrderPending,
+			&reportOrder.AmountOrderSuccess,
+			&reportOrder.AmountOrderFailed,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		reportOrders = append(reportOrders, reportOrder)
+	}
+
+	return reportOrders, nil
+}
+
+func (s *OrderService) AddOrder(newOrder entity.Order) error {
+	// check quantity
+	if newOrder.Quantity <= 0 {
+		return errors.New("quantity must be greater than 0")
+	}
+
+	// check stock
+	var stock int
+	query := "SELECT stock, price FROM drugs WHERE id = $1"
+	err := s.DB.QueryRow(query, newOrder.DrugId).Scan(&stock, &newOrder.Price)
+
+	if err != nil {
+		return errors.New("drug not found")
+	}
+
+	if stock < newOrder.Quantity {
+		return errors.New("stock is not enough")
+	}
+
+	// calculate total price
+	totalPrice := newOrder.Price * float64(newOrder.Quantity)
+
+	// insert order
+	insertQuery := `
+		INSERT INTO orders (user_id, drug_id, quantity, price, total_price)
+		VALUES ($1, $2, $3, $4, $5)
+	`
+
+	_, err = s.DB.Exec(insertQuery, newOrder.UserId, newOrder.DrugId, newOrder.Quantity, newOrder.Price, totalPrice)
+
+	if err != nil {
+		return err
+	}
+
+	// reduce stock
+	updateStockQuery := `
+		UPDATE drugs
+		SET stock = stock - $1
+		WHERE id = $2
+	`
+
+	_, err = s.DB.Exec(updateStockQuery, newOrder.Quantity, newOrder.DrugId)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *OrderService) PayOrder(
+	orderId string,
+	paymentMethod string,
+	paymentAmount float64,
+	userId string,
 ) error {
+	var order entity.Order
 
-	var drug entity.Order
+	query := "SELECT id, total_price, payment_status, user_id, drug_id, quantity FROM orders WHERE id = $1"
 
-	query := "SELECT id, user_id, drug_id, quantity, price, total_price, payment_method, payment_status, delivery_status, created_at, updated_at FROM drug WHERE name = $1"
-
-	err := s.DB.QueryRow(query, name).Scan(
-		&drug.Id,
-		&drug.Name,
-		&drug.Dose,
-		&drug.Form,
-		&drug.Stock,
-		&drug.Price,
-		&drug.ExpiredDate,
-		&drug.Category,
-		&drug.CreatedAt,
-		&drug.UpdatedAt,
-	)
-
-	if len(drug.Id) != 0 {
-		return errors.New("drug already registered")
-	}
-
-	insertQuery := "INSERT INTO drugs (name, dose, form, stock, price, expired_date, category) VALUES ($1, $2, $3, $4, $5, $6, $7)"
-	_, err = s.DB.Exec(insertQuery, name, dose, form, stock, price, expired_date, category)
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("Order Created : %s\n", name)
-
-	return nil
-}
-
-func (s *OrderService) UpdateOrderStock(drugId string, updatedStock int) error {
-
-	var drug entity.Order
-
-	query := "SELECT id, name, dose, form, stock, price, expired_date, category, created_at, updated_at FROM drugs WHERE id = $1"
-
-	err := s.DB.QueryRow(query, drugId).Scan(
-		&drug.Id,
-		&drug.Name,
-		&drug.Dose,
-		&drug.Form,
-		&drug.Stock,
-		&drug.Price,
-		&drug.ExpiredDate,
-		&drug.Category,
-		&drug.CreatedAt,
-		&drug.UpdatedAt,
-	)
+	err := s.DB.QueryRow(query, orderId).Scan(&order.Id, &order.TotalPrice, &order.PaymentStatus, &order.UserId, &order.DrugId, &order.Quantity)
 
 	if err != nil {
-		fmt.Printf("Order with ID : %s not found", drugId)
-		return errors.New("drug not found")
+		fmt.Printf("Order with ID : %s not found", orderId)
+		return errors.New("order not found")
 	}
 
-	updateQuery := "UPDATE drugs SET stock = $1 WHERE id = $2"
-	_, err = s.DB.Exec(updateQuery, updatedStock, drugId)
+	if order.UserId != userId {
+		return errors.New("order is not yours")
+	}
+
+	if order.PaymentStatus == "paid" {
+		return errors.New("order already paid")
+	}
+
+	if order.PaymentStatus == "failed" {
+		return errors.New("order payment already failed")
+	}
+
+	// check if payment amount is equal to total price
+	if paymentAmount != (order.TotalPrice * 1000) {
+		// update paymet status to failed
+		updateQuery := "UPDATE orders SET payment_method = $1, payment_status = $2 WHERE id = $3"
+		_, err = s.DB.Exec(updateQuery, paymentMethod, "failed", orderId)
+		if err != nil {
+			return err
+		}
+
+		// return stock
+		updateStockQuery := `
+			UPDATE drugs
+			SET stock = stock + $1
+			WHERE id = $2
+		`
+
+		_, err = s.DB.Exec(updateStockQuery, order.Quantity, order.DrugId)
+		if err != nil {
+			return err
+		}
+
+		return errors.New("payment amount is not match with total price")
+	}
+
+	// update payment status to paid
+	updateQuery := "UPDATE orders SET payment_method = $1, payment_status = $2, payment_at = $3 WHERE id = $4"
+	_, err = s.DB.Exec(updateQuery, paymentMethod, "paid", time.Now(), orderId)
+
 	if err != nil {
 		return err
 	}
 
 	return nil
-
 }
 
-func (s *OrderService) DeleteOrderById(drugId string) error {
+func (s *OrderService) DeliverOrder(orderId string) error {
+	var order entity.Order
 
-	var drug entity.Order
+	query := "SELECT id, payment_status, delivery_status FROM orders WHERE id = $1"
 
-	query := "SELECT id, name, dose, form, stock, price, expired_date, category, created_at, updated_at FROM drugs WHERE id = $1"
-
-	err := s.DB.QueryRow(query, drugId).Scan(
-		&drug.Id,
-		&drug.Name,
-		&drug.Dose,
-		&drug.Form,
-		&drug.Stock,
-		&drug.Price,
-		&drug.ExpiredDate,
-		&drug.Category,
-		&drug.CreatedAt,
-		&drug.UpdatedAt,
-	)
+	err := s.DB.QueryRow(query, orderId).Scan(&order.Id, &order.PaymentStatus, &order.DeliveryStatus)
 
 	if err != nil {
-		fmt.Printf("Order with ID : %s not found", drugId)
-		return errors.New("drug not found")
+		fmt.Printf("Order with ID : %s not found", orderId)
+		return errors.New("order not found")
 	}
 
-	updateQuery := "DELETE FROM drugs WHERE id = $1"
-	_, err = s.DB.Exec(updateQuery, drugId)
+	if order.DeliveryStatus != "pending" {
+		return errors.New("only undelivered order can be delivered")
+	}
+
+	if order.PaymentStatus != "paid" {
+		return errors.New("only paid order can be delivered")
+	}
+
+	updateQuery := "UPDATE orders SET delivery_status = $1, delivered_at = $2 WHERE id = $3"
+	_, err = s.DB.Exec(updateQuery, "delivered", time.Now(), orderId)
+
 	if err != nil {
 		return err
 	}
 
 	return nil
-
 }
 
-/*
+func (s *OrderService) DeleteOrderById(orderId string, userId string) error {
+	var order entity.Order
 
-INSERT INTO drugs (name, form, dose, stock, price, expired_date, category) VALUES
-("Paracetamol", "Tablet", 500, 12, 5.0, '2025-06-01', 1),
-("Amoxicillin", "Kapsul", 500, 10, 20.0, '2025-07-15', 3),
-("Ibuprofen", "Tablet", 400, 8, 7.0, '2025-08-10', 2),
-("Morfin", "Tablet", 10, 22, 50.0, '2025-01-10', 7),
-("Jahe", "Kapsul", 1000, 10, 15.0, '2025-12-15', 5);
+	query := "SELECT id, user_id, payment_status FROM orders WHERE id = $1"
 
-*/
+	err := s.DB.QueryRow(query, orderId).Scan(&order.Id, &order.UserId, &order.PaymentStatus)
+
+	if err != nil {
+		fmt.Printf("Order with ID : %s not found", orderId)
+		return errors.New("order not found")
+	}
+
+	if order.UserId != userId {
+		return errors.New("order is not yours")
+	}
+
+	if order.PaymentStatus != "failed" {
+		return errors.New("only failed order can be deleted")
+	}
+
+	deleteQuery := "DELETE FROM orders WHERE id = $1"
+	_, err = s.DB.Exec(deleteQuery, orderId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

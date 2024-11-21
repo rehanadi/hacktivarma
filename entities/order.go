@@ -1,11 +1,13 @@
 package entity
 
-import "time"
+import (
+	"time"
+)
 
 type Order struct {
 	Id             string
-	UserId         int
-	DrugId         int
+	UserId         string
+	DrugId         string
 	Quantity       int
 	Price          float64
 	TotalPrice     float64
@@ -13,7 +15,21 @@ type Order struct {
 	PaymentStatus  string
 	PaymentAt      time.Time
 	DeliveryStatus string
-	DeliveryAt     time.Time
+	DeliveredAt    time.Time
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
+	UserName       string
+	DrugName       string
+}
+
+type ReportOrder struct {
+	Date               string
+	TotalOrderAll      int
+	TotalOrderPending  int
+	TotalOrderSuccess  int
+	TotalOrderFailed   int
+	AmountOrderAll     float64
+	AmountOrderPending float64
+	AmountOrderSuccess float64
+	AmountOrderFailed  float64
 }
