@@ -48,24 +48,37 @@ func (oc *OrderController) AddOrder(newOrder entity.Order) error {
 		fmt.Println("Error :", err)
 		return err
 	}
+
 	fmt.Println("Order Created")
 	return nil
 }
 
 func (oc *OrderController) PayOrder(orderId string, paymentMethod string, paymentAmount float64) {
 	err := oc.OrderService.PayOrder(orderId, paymentMethod, paymentAmount)
+
 	if err != nil {
 		fmt.Println("Error payment order :", err)
 		return
 	}
+
 	fmt.Println("Payment success :", orderId)
 }
 
 func (oc *OrderController) DeliverOrder(orderId string) {
 	err := oc.OrderService.DeliverOrder(orderId)
+
 	if err != nil {
 		fmt.Println("Error deliver order :", err)
 		return
 	}
+
 	fmt.Println("Deliver success :", orderId)
+}
+
+func (oc *OrderController) DeleteOrderById(orderId string) {
+	err := oc.OrderService.DeleteOrderById(orderId)
+
+	if err != nil {
+		fmt.Println("Error delete order :", err)
+	}
 }
