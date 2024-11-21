@@ -8,5 +8,6 @@ type User struct {
 	Role      string
 	Email     string
 	Password  string
+	Location  int
 	CreatedAt time.Time
 }
