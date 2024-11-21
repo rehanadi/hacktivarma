@@ -61,3 +61,39 @@ func (uc *UserController) RegisterUser(name, email, password string, currentUser
 	fmt.Println("User Created")
 	return nil
 }
+
+func (uc *UserController) DeleteUserById(userId string) {
+	err := uc.UserService.DeleteUserById(userId)
+
+	if err != nil {
+		fmt.Println("Error delete user :", err)
+		return
+	}
+}
+
+func (uc *UserController) UpdateUserEmailById(userId, updatedEmail string) {
+	err := uc.UserService.UpdateUserEmailById(userId, updatedEmail)
+	if err != nil {
+		fmt.Println("Error update email :", err)
+		return
+	}
+	fmt.Println("Update success :", userId, updatedEmail)
+}
+
+func (uc *UserController) UpdateUserNameById(userId, updatedName string) {
+	err := uc.UserService.UpdateUserNameById(userId, updatedName)
+	if err != nil {
+		fmt.Println("Error update name :", err)
+		return
+	}
+	fmt.Println("Update success :", userId, updatedName)
+}
+
+func (uc *UserController) GetUserById(userId string) (*entity.User, error) {
+	user, err := uc.UserService.GetUserById(userId)
+	if err != nil {
+		fmt.Println("Error find user :", err)
+		return nil, err
+	}
+	return user, nil
+}

@@ -12,9 +12,13 @@ import (
 	"hacktivarma/users"
 )
 
-func showMenuCustomer(currentUser entity.User) {
+func showMenuCustomer(currentUser entity.User, uc *users.UserController) {
+	user, err := uc.GetUserById(currentUser.Id)
+	if err != nil {
+		fmt.Println(err)
+	}
 	fmt.Printf("\n\n\t -- Hacktivarma -- \n\n")
-	fmt.Printf("Welcome, %-15s %s'\n\n", currentUser.Name, fmt.Sprintf("Role : '"+currentUser.Role))
+	fmt.Printf("Welcome, %-15s %s'\n\n", user.Name, fmt.Sprintf("Role : '"+user.Role))
 	fmt.Printf("1. All Drugs\n")
 
 	fmt.Printf("\n0. Exit \n")
@@ -28,10 +32,14 @@ func screenLine(width int) {
 	fmt.Println("")
 }
 
-func showMenuEmployee(currentUser entity.User) {
+func showMenuEmployee(currentUser entity.User, uc *users.UserController) {
 	width := 32
+	user, err := uc.GetUserById(currentUser.Id)
+	if err != nil {
+		fmt.Println(err)
+	}
 	fmt.Printf("\n\n\t -- Hacktivarma -- \n\n")
-	fmt.Printf("Hello, %-15s %s'\n\n", currentUser.Name, fmt.Sprintf("Role : '"+currentUser.Role))
+	fmt.Printf("Hello, %-15s %s'\n\n", user.Name, fmt.Sprintf("Role : '"+user.Role))
 	fmt.Printf("21. All Drugs (Employee)\n")
 	fmt.Printf("22. Add Drug (Employee)\n")
 	fmt.Printf("23. Update Drug Stock (Employee)\n")
@@ -41,6 +49,9 @@ func showMenuEmployee(currentUser entity.User) {
 
 	fmt.Printf("31. All Users (Employee)\n")
 	fmt.Printf("32. Add Employee (Employee)\n")
+	fmt.Printf("33. Update User Name By ID (Employee)\n")
+	fmt.Printf("34. Delete User By ID (Employee)\n")
+	fmt.Printf("35. Update User Email By ID (Employee)\n")
 
 	screenLine(width)
 
@@ -132,9 +143,9 @@ func main() {
 	for {
 
 		if currentUser.Role == "customer" {
-			showMenuCustomer(currentUser)
+			showMenuCustomer(currentUser, userController)
 		} else if currentUser.Role == "employee" {
-			showMenuEmployee(currentUser)
+			showMenuEmployee(currentUser, userController)
 		}
 
 		fmt.Printf("\nPilih menu : ")
@@ -276,6 +287,69 @@ func main() {
 				fmt.Println(err)
 				return
 			}
+		case 33:
+			if currentUser.Role != "employee" {
+				fmt.Println("Forbidden!")
+				return
+			}
+			fmt.Println("Update User Name By ID (Employee)")
+
+			userController.GetAllUsers()
+
+			var inputUserId string
+			var inputUserName string
+
+			fmt.Printf("Enter User ID : ")
+			scanner.Scan()
+			inputUserId = scanner.Text()
+
+			fmt.Printf("Enter New User Name : ")
+			scanner.Scan()
+			inputUserName = scanner.Text()
+
+			userController.UpdateUserNameById(inputUserId, inputUserName)
+
+			userController.GetAllUsers()
+		case 34:
+			if currentUser.Role != "employee" {
+				fmt.Println("Forbidden!")
+				return
+			}
+			fmt.Println("Delete User By ID (Employee)")
+			userController.GetAllUsers()
+			var inputUserId string
+
+			fmt.Printf("Enter User ID : ")
+			scanner.Scan()
+			inputUserId = scanner.Text()
+
+			userController.DeleteUserById(inputUserId)
+
+			userController.GetAllUsers()
+		case 35:
+			if currentUser.Role != "employee" {
+				fmt.Println("Forbidden!")
+				return
+			}
+			fmt.Println("Update User Email By ID (Employee)")
+
+			userController.GetAllUsers()
+
+			var inputUserId string
+			var inputUserEmail string
+
+			fmt.Printf("Enter User ID : ")
+			scanner.Scan()
+			inputUserId = scanner.Text()
+
+			fmt.Printf("Enter New User Email : ")
+			scanner.Scan()
+			inputUserEmail = scanner.Text()
+
+			userController.UpdateUserEmailById(inputUserId, inputUserEmail)
+
+			userController.GetAllUsers()
+
 		case 0:
 			fmt.Printf("\n\tThank You!\n\n")
 		}
