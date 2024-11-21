@@ -65,6 +65,12 @@ func showMenuEmployee(currentUser entity.User, uc *users.UserController) {
 
 	screenLine(width)
 
+	fmt.Printf("41. All Orders (Employee)\n")
+	fmt.Printf("42. Deliver Order (Employee)\n")
+	fmt.Printf("43. View Report Orders (Employee)\n")
+
+	screenLine(width)
+
 	fmt.Printf("\n0. Exit  (Employee)\n")
 }
 
@@ -363,7 +369,47 @@ func main() {
 
 			userController.GetAllUsers()
 
+		case 41:
+			if currentUser.Role != "employee" {
+				fmt.Println("Forbidden!")
+				return
+			}
+			fmt.Println("ALL ORDERS (Employee)")
+			orderController.GetAllOrders(nil)
+
+		case 42:
+			if currentUser.Role != "employee" {
+				fmt.Println("Forbidden!")
+				return
+			}
+			fmt.Println("DELIVER ORDER (Employee)")
+
+			orders, err := orderController.GetUndeliveredOrders()
+
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+
+			if len(orders) == 0 {
+				fmt.Println("No undelivered order to deliver")
+				continue
+			}
+
+			var inputOrderID string
+
+			fmt.Printf("Enter Order ID : ")
+			scanner.Scan()
+			inputOrderID = scanner.Text()
+
+			orderController.DeliverOrder(inputOrderID)
+
 		case 101:
+			if currentUser.Role != "customer" {
+				fmt.Println("Forbidden!")
+				return
+			}
+			fmt.Println("ALL ORDERS (Customer)")
 			orderController.GetAllOrders(currentUser.Id)
 
 		case 102:
