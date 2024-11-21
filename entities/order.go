@@ -4,8 +4,8 @@ import "time"
 
 type Order struct {
 	Id             string
-	UserId         int
-	DrugId         int
+	UserId         string
+	DrugId         string
 	Quantity       int
 	Price          float64
 	TotalPrice     float64
