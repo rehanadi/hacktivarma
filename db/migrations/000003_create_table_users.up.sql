@@ -10,7 +10,4 @@ CREATE TABLE users (
 
 INSERT INTO users (name, role, email, password) VALUES
 ('user1', 'employee', 'user1@mail.com', 'user1pass'),
-('user2', 'employee', 'user2@mail.com', 'user2pass'),
-('Jono', 'customer', 'jono@mail.com', 'jonopass'),
-('Miranda', 'customer', 'miranda@mail.com', 'mirandapass'),
-('Lestari', 'customer', 'lestari@mail.com', 'lestaripass');
+('user2', 'employee', 'user2@mail.com', 'user2pass');
