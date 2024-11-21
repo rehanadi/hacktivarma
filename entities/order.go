@@ -13,7 +13,9 @@ type Order struct {
 	PaymentStatus  string
 	PaymentAt      time.Time
 	DeliveryStatus string
-	DeliveryAt     time.Time
+	DeliveredAt    time.Time
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
+	UserName       string
+	DrugName       string
 }
