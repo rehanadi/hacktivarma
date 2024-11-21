@@ -186,3 +186,24 @@ func (s *OrderService) DeliverOrder(orderId string) error {
 
 	return nil
 }
+
+func (s *OrderService) DeleteOrderById(orderId string) error {
+	var order entity.Order
+
+	query := "SELECT id FROM orders WHERE id = $1"
+
+	err := s.DB.QueryRow(query, orderId).Scan(&order.Id)
+
+	if err != nil {
+		fmt.Printf("Order with ID : %s not found", orderId)
+		return errors.New("order not found")
+	}
+
+	deleteQuery := "DELETE FROM orders WHERE id = $1"
+	_, err = s.DB.Exec(deleteQuery, orderId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
