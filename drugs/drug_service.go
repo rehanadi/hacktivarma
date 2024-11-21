@@ -57,6 +57,32 @@ func (s *DrugService) GetAllDrugs() ([]entity.Drug, error) {
 	return drugs, nil
 }
 
+func (s *DrugService) FindDrugByID(drugID string) (entity.Drug, error) {
+	var drug entity.Drug
+
+	query := `
+		SELECT drugs.id, drugs.name, categories.name, drugs.stock, drugs.price, drugs.expired_date, drugs.created_at
+		FROM drugs
+		JOIN categories ON drugs.category = categories.id 
+		WHERE drugs.id = $1
+	`
+	err := s.DB.QueryRow(query, drugID).Scan(
+		&drug.Id,
+		&drug.Name,
+		&drug.CategoryName,
+		&drug.Stock,
+		&drug.Price,
+		&drug.ExpiredDate,
+		&drug.CreatedAt,
+	)
+
+	if err != nil {
+		return drug, fmt.Errorf("error retrieving drug: %v", err)
+	}
+
+	return drug, nil
+}
+
 func (s *DrugService) AddDrug(drug entity.Drug) error {
 	query := "SELECT id FROM drugs WHERE name = $1"
 	var existingID string
@@ -116,7 +142,6 @@ func (s *DrugService) UpdateDrugStock(drugId string, updatedStock int) error {
 	}
 
 	return nil
-
 }
 
 func (s *DrugService) DeleteDrugById(drugId string) error {

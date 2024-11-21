@@ -41,6 +41,27 @@ func (dc *DrugController) GetAllDrugs() {
 	screenLine(width)
 }
 
+func (dc *DrugController) FindDrugByID(drugID string) {
+	width := 84
+	drug, err := dc.DrugService.FindDrugByID(drugID)
+
+	if err != nil {
+		fmt.Println("Error :", err)
+	}
+
+	if len(drug.CategoryName) > 10 {
+		drug.CategoryName = drug.CategoryName[:10] + "..." // Truncate to 10 characters
+	}
+
+	screenLine(width)
+	fmt.Printf("%-8s | %-14s | %-14s | %-5v | %-11s | %-14s\n", "ID", "Drug Name", "Category", "Stock", "Price", "Expired")
+	screenLine(width)
+
+	fmt.Printf("%-8s | %-14s | %-14s | %-5v | Rp %-8.0f | %-14s\n", drug.Id, drug.Name, drug.CategoryName, drug.Stock, drug.Price*1000, drug.ExpiredDate.Format("2006-01-02"))
+
+	screenLine(width)
+}
+
 func (dc *DrugController) AddDrug(drug entity.Drug) error {
 	err := dc.DrugService.AddDrug(drug)
 

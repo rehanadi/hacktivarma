@@ -35,15 +35,18 @@ func screenLine(width int) {
 func showMenuEmployee(currentUser entity.User, uc *users.UserController) {
 	width := 32
 	user, err := uc.GetUserById(currentUser.Id)
+
 	if err != nil {
 		fmt.Println(err)
 	}
+
 	fmt.Printf("\n\n\t -- Hacktivarma -- \n\n")
 	fmt.Printf("Hello, %-15s %s'\n\n", user.Name, fmt.Sprintf("Role : '"+user.Role))
 	fmt.Printf("21. All Drugs (Employee)\n")
-	fmt.Printf("22. Add Drug (Employee)\n")
-	fmt.Printf("23. Update Drug Stock (Employee)\n")
-	fmt.Printf("24. Delete Drug By ID (Employee)\n")
+	fmt.Printf("22. Find Drug By ID (Employee)\n")
+	fmt.Printf("23. Add Drug (Employee)\n")
+	fmt.Printf("24. Update Drug Stock (Employee)\n")
+	fmt.Printf("25. Delete Drug By ID (Employee)\n")
 
 	screenLine(width)
 
@@ -168,6 +171,19 @@ func main() {
 				fmt.Println("Forbidden!")
 				return
 			}
+
+			var drugID string
+
+			fmt.Println("Find Drug By ID")
+			fmt.Print("Enter Drug ID: ")
+			fmt.Scan(&drugID)
+
+			drugController.FindDrugByID(drugID)
+		case 23:
+			if currentUser.Role != "employee" {
+				fmt.Println("Forbidden!")
+				return
+			}
 			fmt.Println("ADD DRUG (Employee)")
 
 			var inputDrugStock, inputDrugCategory int
@@ -219,7 +235,7 @@ func main() {
 			}
 			drugController.GetAllDrugs()
 
-		case 23:
+		case 24:
 			if currentUser.Role != "employee" {
 				fmt.Println("Forbidden!")
 				return
@@ -240,7 +256,7 @@ func main() {
 
 			drugController.UpdateDrugStock(inputDrugId, inputDrugStock)
 
-		case 24:
+		case 25:
 			if currentUser.Role != "employee" {
 				fmt.Println("Forbidden!")
 				return
