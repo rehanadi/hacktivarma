@@ -41,9 +41,9 @@ func (oc *OrderController) GetAllOrders(userId interface{}) {
 	screenLine(width)
 }
 
-func (oc *OrderController) GetUnpaidOrders(userId string) {
+func (oc *OrderController) GetUnpaidOrders(userId string) (orders []entity.Order, err error) {
 	width := 80
-	allOrders, err := oc.OrderService.GetUnpaidOrders(userId)
+	orders, err = oc.OrderService.GetUnpaidOrders(userId)
 	if err != nil {
 		fmt.Println("Error :", err)
 	}
@@ -53,12 +53,13 @@ func (oc *OrderController) GetUnpaidOrders(userId string) {
 		"ID", "User", "Drug", "Quantity", "Price", "Total", "Order At", "Payment Method", "Payment Status", "Payment At", "Delivery Status", "Delivered At")
 	screenLine(width)
 
-	for _, order := range allOrders {
+	for _, order := range orders {
 		fmt.Printf("%-8v | %-14v | %-14v | %-8v | Rp %-8.0f | Rp %-12.0f | %-20v | %-14v | %-14v | %-20v | %-15v | %-20v\n",
 			order.Id, order.UserName, order.DrugName, order.Quantity, order.Price*1000, order.TotalPrice*1000, order.CreatedAt.Format("2006-01-02"), order.PaymentMethod, order.PaymentStatus, order.PaymentAt.Format("2006-01-02"), order.DeliveryStatus, order.DeliveredAt.Format("2006-01-02"))
 	}
 
 	screenLine(width)
+	return
 }
 
 func (oc *OrderController) AddOrder(newOrder entity.Order) error {
