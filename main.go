@@ -77,6 +77,7 @@ func main() {
 	var inputEmail string
 	var inputPassword string
 	var inputName string
+	var inputLocation string
 
 	for {
 
@@ -114,6 +115,9 @@ func main() {
 			scanner.Scan()
 			inputName = scanner.Text()
 
+			fmt.Printf("Enter location : ")
+			fmt.Scanln(&inputLocation)
+
 			fmt.Printf("Enter email : ")
 			scanner.Scan()
 			inputEmail = scanner.Text()
@@ -122,7 +126,7 @@ func main() {
 			scanner.Scan()
 			inputPassword = scanner.Text()
 
-			err := userController.RegisterUser(inputName, inputEmail, inputPassword, currentUser)
+			err := userController.RegisterUser(inputName, inputEmail, inputPassword, inputLocation, currentUser)
 			if err != nil {
 				fmt.Println(err)
 				return
@@ -274,6 +278,10 @@ func main() {
 			scanner.Scan()
 			inputName = scanner.Text()
 
+			fmt.Printf("Enter location : ")
+			scanner.Scan()
+			inputLocation = scanner.Text()
+
 			fmt.Printf("Enter email : ")
 			scanner.Scan()
 			inputEmail = scanner.Text()
@@ -282,7 +290,7 @@ func main() {
 			scanner.Scan()
 			inputPassword = scanner.Text()
 
-			err := userController.RegisterUser(inputName, inputEmail, inputPassword, currentUser)
+			err := userController.RegisterUser(inputName, inputEmail, inputPassword, inputLocation, currentUser)
 			if err != nil {
 				fmt.Println(err)
 				return

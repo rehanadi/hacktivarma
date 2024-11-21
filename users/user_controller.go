@@ -52,8 +52,8 @@ func (uc *UserController) UserLogin(email, password string) (*entity.User, error
 	return user, nil
 }
 
-func (uc *UserController) RegisterUser(name, email, password string, currentUser entity.User) error {
-	err := uc.UserService.RegisterUser(name, email, password, currentUser)
+func (uc *UserController) RegisterUser(name, email, password, location string, currentUser entity.User) error {
+	err := uc.UserService.RegisterUser(name, email, password, location, currentUser)
 	if err != nil {
 		fmt.Println("Error :", err)
 		return err

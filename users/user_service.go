@@ -4,9 +4,12 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	entity "hacktivarma/entities"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService struct {
@@ -61,7 +64,7 @@ func (s *UserService) UserLogin(email, password string) (*entity.User, error) {
 
 	var user entity.User
 
-	query := "SELECT id, name, role, email, password, created_at FROM users WHERE email = $1"
+	query := "SELECT id, name, role, email, password, location, created_at FROM users WHERE email = $1"
 
 	err := s.DB.QueryRow(query, email).Scan(
 		&user.Id,
@@ -69,6 +72,7 @@ func (s *UserService) UserLogin(email, password string) (*entity.User, error) {
 		&user.Role,
 		&user.Email,
 		&user.Password,
+		&user.Location,
 		&user.CreatedAt,
 	)
 
@@ -76,20 +80,24 @@ func (s *UserService) UserLogin(email, password string) (*entity.User, error) {
 		return nil, errors.New("user not found")
 	}
 
-	if password == user.Password {
-		return &user, nil
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		return nil, errors.New("wrong password")
 	}
 
-	return nil, errors.New("wrong password")
+	return &user, nil
 }
 
-func (s *UserService) RegisterUser(name, email, password string, currentUser entity.User) error {
-
+func (s *UserService) RegisterUser(name, email, password, userLocation string, currentUser entity.User) error {
+	location, err := strconv.Atoi(userLocation)
+	if err != nil {
+		return err
+	}
 	var user entity.User
 
 	query := "SELECT id, name, role, email, password, created_at FROM users WHERE email = $1"
 
-	err := s.DB.QueryRow(query, email).Scan(
+	err = s.DB.QueryRow(query, email).Scan(
 		&user.Id,
 		&user.Name,
 		&user.Role,
@@ -102,15 +110,20 @@ func (s *UserService) RegisterUser(name, email, password string, currentUser ent
 		return errors.New("email already registered")
 	}
 
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
 	if currentUser.Role == "employee" {
-		insertQuery := "INSERT INTO USERS (name, role, email, password) VALUES ($1, $2, $3, $4)"
-		_, err = s.DB.Exec(insertQuery, name, currentUser.Role, email, password)
+		insertQuery := "INSERT INTO USERS (name, role, email, password, location) VALUES ($1, $2, $3, $4, $5)"
+		_, err = s.DB.Exec(insertQuery, name, currentUser.Role, email, hashedPassword, location)
 		if err != nil {
 			return err
 		}
 	} else {
-		insertQuery := "INSERT INTO USERS (name, email, password) VALUES ($1, $2, $3)"
-		_, err = s.DB.Exec(insertQuery, name, email, password)
+		insertQuery := "INSERT INTO USERS (name, email, password, location) VALUES ($1, $2, $3, $4)"
+		_, err = s.DB.Exec(insertQuery, name, email, hashedPassword, location)
 		if err != nil {
 			return err
 		}
