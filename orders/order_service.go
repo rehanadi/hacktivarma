@@ -30,8 +30,10 @@ func (s *OrderService) GetAllOrders(userId interface{}) ([]entity.Order, error) 
 	`
 
 	if userId != nil {
-		query += "AND a.user_id = '" + userId.(string) + "'"
+		query += " AND a.user_id = '" + userId.(string) + "'"
 	}
+
+	query += " ORDER BY a.created_at"
 
 	rows, err := s.DB.Query(query)
 	if err != nil {
@@ -40,24 +42,39 @@ func (s *OrderService) GetAllOrders(userId interface{}) ([]entity.Order, error) 
 
 	for rows.Next() {
 		var order entity.Order
+		var paymentMethod *string
+		var paymentAt, deliveredAt *time.Time
 
-		rows.Scan(
+		err := rows.Scan(
 			&order.Id,
 			&order.UserId,
 			&order.DrugId,
 			&order.Quantity,
 			&order.Price,
 			&order.TotalPrice,
-			&order.PaymentMethod,
+			&paymentMethod,
 			&order.PaymentStatus,
-			&order.PaymentAt,
+			&paymentAt,
 			&order.DeliveryStatus,
-			&order.DeliveredAt,
+			&deliveredAt,
 			&order.CreatedAt,
 			&order.UpdatedAt,
 			&order.UserName,
 			&order.DrugName,
 		)
+		if err != nil {
+			return nil, err
+		}
+
+		if paymentMethod != nil {
+			order.PaymentMethod = *paymentMethod
+		}
+		if paymentAt != nil {
+			order.PaymentAt = *paymentAt
+		}
+		if deliveredAt != nil {
+			order.DeliveredAt = *deliveredAt
+		}
 
 		orders = append(orders, order)
 	}
@@ -73,8 +90,8 @@ func (s *OrderService) AddOrder(newOrder entity.Order) error {
 
 	// check stock
 	var stock int
-	query := "SELECT stock FROM drugs WHERE id = $1"
-	err := s.DB.QueryRow(query, newOrder.DrugId).Scan(&stock)
+	query := "SELECT stock, price FROM drugs WHERE id = $1"
+	err := s.DB.QueryRow(query, newOrder.DrugId).Scan(&stock, &newOrder.Price)
 
 	if err != nil {
 		return errors.New("drug not found")
@@ -112,8 +129,6 @@ func (s *OrderService) AddOrder(newOrder entity.Order) error {
 		return err
 	}
 
-	fmt.Printf("Order Created\n")
-
 	return nil
 }
 
@@ -137,11 +152,14 @@ func (s *OrderService) PayOrder(orderId string, paymentMethod string, paymentAmo
 		return errors.New("order payment already failed")
 	}
 
-	// check if payment amount is enough
-	if paymentAmount < order.TotalPrice {
+	// check if payment amount is equal to total price
+	if paymentAmount != order.TotalPrice {
 		// update paymet status to failed
 		updateQuery := "UPDATE orders SET payment_method = $1, payment_status = $2 WHERE id = $3"
 		_, err = s.DB.Exec(updateQuery, paymentMethod, "failed", orderId)
+		if err != nil {
+			return err
+		}
 
 		// return stock
 		updateStockQuery := `
@@ -151,6 +169,9 @@ func (s *OrderService) PayOrder(orderId string, paymentMethod string, paymentAmo
 		`
 
 		_, err = s.DB.Exec(updateStockQuery, order.Quantity, order.DrugId)
+		if err != nil {
+			return err
+		}
 
 		return errors.New("payment amount is not enough")
 	}
