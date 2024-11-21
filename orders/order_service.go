@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 
 	entity "hacktivarma/entities"
 )
@@ -107,6 +108,55 @@ func (s *OrderService) AddOrder(newOrder entity.Order) error {
 	}
 
 	fmt.Printf("Order Created\n")
+
+	return nil
+}
+
+func (s *OrderService) PayOrder(orderId string, paymentMethod string, paymentAmount float64) error {
+	var order entity.Order
+
+	query := "SELECT id, total_price, payment_status FROM orders WHERE id = $1"
+
+	err := s.DB.QueryRow(query, orderId).Scan(&order.Id, &order.TotalPrice, &order.PaymentStatus)
+
+	if err != nil {
+		fmt.Printf("Order with ID : %s not found", orderId)
+		return errors.New("order not found")
+	}
+
+	if order.PaymentStatus == "paid" {
+		return errors.New("order already paid")
+	}
+
+	if order.PaymentStatus == "failed" {
+		return errors.New("order payment already failed")
+	}
+
+	// check if payment amount is enough
+	if paymentAmount < order.TotalPrice {
+		// update paymet status to failed
+		updateQuery := "UPDATE orders SET payment_method = $1, payment_status = $2 WHERE id = $3"
+		_, err = s.DB.Exec(updateQuery, paymentMethod, "failed", orderId)
+
+		// return stock
+		updateStockQuery := `
+			UPDATE drugs
+			SET stock = stock + $1
+			WHERE id = $2
+		`
+
+		_, err = s.DB.Exec(updateStockQuery, order.Quantity, order.DrugId)
+
+		return errors.New("payment amount is not enough")
+	}
+
+	// update payment status to paid
+	updateQuery := "UPDATE orders SET payment_method = $1, payment_status = $2, payment_at = $3 WHERE id = $4"
+	_, err = s.DB.Exec(updateQuery, paymentMethod, "paid", time.Now(), orderId)
+
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
