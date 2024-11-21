@@ -51,3 +51,12 @@ func (oc *OrderController) AddOrder(newOrder entity.Order) error {
 	fmt.Println("Order Created")
 	return nil
 }
+
+func (oc *OrderController) PayOrder(orderId string, paymentMethod string, paymentAmount float64) {
+	err := oc.OrderService.PayOrder(orderId, paymentMethod, paymentAmount)
+	if err != nil {
+		fmt.Println("Error payment order :", err)
+		return
+	}
+	fmt.Println("Payment success :", orderId)
+}
