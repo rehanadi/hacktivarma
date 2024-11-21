@@ -12,6 +12,7 @@ import (
 	"hacktivarma/db"
 	"hacktivarma/drugs"
 	entity "hacktivarma/entities"
+	"hacktivarma/locations"
 	"hacktivarma/orders"
 	"hacktivarma/users"
 )
@@ -35,7 +36,7 @@ func showMenuCustomer(currentUser entity.User, uc *users.UserController) {
 
 	screenLine(width)
 
-	fmt.Printf("\n0. Exit \n")
+	fmt.Printf("\n0. Logout \n")
 }
 
 func showMenuEmployee(currentUser entity.User, uc *users.UserController) {
@@ -69,7 +70,7 @@ func showMenuEmployee(currentUser entity.User, uc *users.UserController) {
 
 	screenLine(width)
 
-	fmt.Printf("\n0. Exit  (Employee)\n")
+	fmt.Printf("\n0. Logout (Employee)\n")
 }
 
 func screenLine(width int) {
@@ -101,6 +102,9 @@ func main() {
 
 	categoryService := categories.NewCategoryService(db)
 	categoryController := categories.NewCategoryController(categoryService)
+
+	locationService := locations.NewLocationService(db)
+	locationController := locations.NewLocationController(locationService)
 
 	drugService := drugs.NewDrugService(db)
 	drugController := drugs.NewDrugController(drugService)
@@ -155,6 +159,8 @@ func main() {
 			scanner.Scan()
 			inputName = scanner.Text()
 
+			locationController.GetAllLocations()
+
 			fmt.Printf("Enter location : ")
 			fmt.Scanln(&inputLocation)
 
@@ -176,7 +182,7 @@ func main() {
 
 		case 0:
 			fmt.Printf("\n\tThank You!\n\n")
-			return
+			os.Exit(0)
 		}
 
 		if inputMenu == 0 {
@@ -320,6 +326,8 @@ func main() {
 			fmt.Printf("\nEnter name : ")
 			scanner.Scan()
 			inputName = scanner.Text()
+
+			locationController.GetAllLocations()
 
 			fmt.Printf("Enter location : ")
 			scanner.Scan()
@@ -567,6 +575,7 @@ func main() {
 
 		case 0:
 			fmt.Printf("\n\tThank You!\n\n")
+			main()
 		}
 
 		if inputMenu == 0 {
