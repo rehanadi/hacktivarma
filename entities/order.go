@@ -4,24 +4,16 @@ import "time"
 
 type Order struct {
 	Id             string
-	OrderNumber    string
-	UserId         string
+	UserId         int
+	DrugId         int
+	Quantity       int
+	Price          float64
 	TotalPrice     float64
 	PaymentMethod  string
 	PaymentStatus  string
+	PaymentAt      time.Time
 	DeliveryStatus string
 	DeliveryAt     time.Time
-	PaymentAt      time.Time
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
-}
-
-type OrderDetail struct {
-	Id        string
-	OrderId   string
-	DrugId    string
-	Quantity  int
-	Price     float64
-	CreatedAt time.Time
-	UpdatedAt time.Time
 }
