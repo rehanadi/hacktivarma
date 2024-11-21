@@ -17,7 +17,7 @@ func NewOrderService(db *sql.DB) *OrderService {
 	return &OrderService{DB: db}
 }
 
-func (s *OrderService) GetAllOrders() ([]entity.Order, error) {
+func (s *OrderService) GetAllOrders(userId interface{}) ([]entity.Order, error) {
 	var orders []entity.Order
 
 	query := `
@@ -28,6 +28,11 @@ func (s *OrderService) GetAllOrders() ([]entity.Order, error) {
 		WHERE a.user_id = b.id
 		AND a.drug_id = c.id
 	`
+
+	if userId != nil {
+		query += "AND a.user_id = '" + userId.(string) + "'"
+	}
+
 	rows, err := s.DB.Query(query)
 	if err != nil {
 		return nil, err

@@ -1,17 +1,15 @@
-package drugs
+package orders
 
 import (
 	"fmt"
-
-	entity "hacktivarma/entities"
 )
 
-type DrugController struct {
-	DrugService *DrugService
+type OrderController struct {
+	OrderService *OrderService
 }
 
-func NewDrugController(drugService *DrugService) *DrugController {
-	return &DrugController{DrugService: drugService}
+func NewOrderController(orderService *OrderService) *OrderController {
+	return &OrderController{OrderService: orderService}
 }
 
 func screenLine(width int) {
@@ -21,58 +19,22 @@ func screenLine(width int) {
 	fmt.Println("")
 }
 
-func (dc *DrugController) GetAllDrugs() {
+func (oc *OrderController) GetAllOrders(userId interface{}) {
 	width := 64
-	allDrugs, err := dc.DrugService.GetAllDrugs()
+	allOrders, err := oc.OrderService.GetAllOrders(userId)
 	if err != nil {
 		fmt.Println("Error :", err)
 	}
 
 	screenLine(width)
-	fmt.Printf("%-8s | %-14s | %-5v | %-11s | %-14v\n", "ID", "Drug Name", "Stock", "Price", "Expired")
+	fmt.Printf("%-8s | %-14s | %-14s | %-8s | %-8s | %-12s | %-14s | %-14s | %-20s | %-15s | %-20s | %-20s | %-20s\n",
+		"ID", "User Name", "Drug Name", "Quantity", "Price", "Total Price", "Payment Method", "Payment Status", "Payment At", "Delivery Status", "Delivered At", "Created At", "Updated At")
 	screenLine(width)
 
-	for _, drug := range allDrugs {
-		fmt.Printf("%-8v | %-14v | %-5v | Rp %-8.0f | %-14v\n", drug.Id, drug.Name, drug.Stock, drug.Price*1000, drug.ExpiredDate.Format("2006-01-02"))
+	for _, order := range allOrders {
+		fmt.Printf("%-8v | %-14v | %-14v | %-8v | Rp %-8.0f | Rp %-12.0f | %-14v | %-14v | %-20v | %-15v | %-20v | %-20v | %-20v\n",
+			order.Id, order.UserName, order.DrugName, order.Quantity, order.Price*1000, order.TotalPrice*1000, order.PaymentMethod, order.PaymentStatus, order.PaymentAt.Format("2006-01-02"), order.DeliveryStatus, order.DeliveredAt.Format("2006-01-02"), order.CreatedAt.Format("2006-01-02"), order.UpdatedAt.Format("2006-01-02"))
 	}
 
 	screenLine(width)
-
-	//
-
-}
-
-func (dc *DrugController) AddDrug(
-	// name string, dose float64, form string, stock int, price float64, expired_date string, category int,
-	drug entity.Drug,
-) error {
-	err := dc.DrugService.AddDrug(
-		// name, dose, form, stock, price, expired_date, category,
-		drug.Name, drug.Dose, drug.Form, drug.Stock, drug.Price, drug.ExpiredDate.Format("2006-01-02"), drug.Category,
-	)
-	if err != nil {
-		fmt.Println("Error :", err)
-		return err
-	}
-	fmt.Println("Drug Created")
-	return nil
-}
-
-func (dc *DrugController) UpdateDrugStock(drugId string, updatedStock int) {
-
-	err := dc.DrugService.UpdateDrugStock(drugId, updatedStock)
-	if err != nil {
-		fmt.Println("Error update stock :", err)
-		return
-	}
-	fmt.Println("Update success :", drugId, updatedStock)
-}
-
-func (dc *DrugController) DeleteDrugById(drugId string) {
-
-	err := dc.DrugService.DeleteDrugById(drugId)
-
-	if err != nil {
-		fmt.Println("Error delete drug :", err)
-	}
 }
