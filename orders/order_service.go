@@ -160,3 +160,29 @@ func (s *OrderService) PayOrder(orderId string, paymentMethod string, paymentAmo
 
 	return nil
 }
+
+func (s *OrderService) DeliverOrder(orderId string) error {
+	var order entity.Order
+
+	query := "SELECT id, delivery_status FROM orders WHERE id = $1"
+
+	err := s.DB.QueryRow(query, orderId).Scan(&order.Id, &order.DeliveryStatus)
+
+	if err != nil {
+		fmt.Printf("Order with ID : %s not found", orderId)
+		return errors.New("order not found")
+	}
+
+	if order.DeliveryStatus == "delivered" {
+		return errors.New("order already delivered")
+	}
+
+	updateQuery := "UPDATE orders SET delivery_status = $1, delivered_at = $2 WHERE id = $3"
+	_, err = s.DB.Exec(updateQuery, "delivered", time.Now(), orderId)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
