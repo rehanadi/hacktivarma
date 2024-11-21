@@ -1,7 +1,7 @@
 create table orders (
   id CHAR(8) DEFAULT SUBSTRING(REPLACE(uuid_generate_v4()::text, '-', ''), 1, 8),
-  user_id INT NOT NULL,
-  drug_id INT NOT NULL,
+  user_id CHAR(8) NOT NULL,
+  drug_id CHAR(8) NOT NULL,
   quantity INT NOT NULL DEFAULT 0,
   price DECIMAL(10, 2) NOT NULL DEFAULT 0.0,
   total_price DECIMAL(10, 2) NOT NULL DEFAULT 0.0,
@@ -13,7 +13,7 @@ create table orders (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT pk_orders PRIMARY KEY(id),
-  CONSTRAINT fk_order_user FOREIGN KEY(user_id) REFERENCES users(id)
+  CONSTRAINT fk_order_user FOREIGN KEY(user_id) REFERENCES users(id),
   CONSTRAINT fk_order_drug FOREIGN KEY(drug_id) REFERENCES drugs(id)
 );
 
