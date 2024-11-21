@@ -177,3 +177,32 @@ func (s *UserService) UpdateUserEmailById(userId string, updatedEmail string) er
 
 	return nil
 }
+
+func (s *UserService) UpdateUserNameById(userId string, updatedName string) error {
+
+	var user entity.User
+
+	query := "SELECT id, name, role, email, password, created_at FROM users WHERE id = $1"
+
+	err := s.DB.QueryRow(query, userId).Scan(
+		&user.Id,
+		&user.Name,
+		&user.Role,
+		&user.Email,
+		&user.Password,
+		&user.CreatedAt,
+	)
+
+	if err != nil {
+		fmt.Printf("User with ID : %s not found\n", userId)
+		return errors.New("user not found")
+	}
+
+	updateQuery := "UPDATE users SET name = $1 WHERE id = $2"
+	_, err = s.DB.Exec(updateQuery, updatedName, userId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

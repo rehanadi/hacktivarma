@@ -41,8 +41,9 @@ func showMenuEmployee(currentUser entity.User) {
 
 	fmt.Printf("31. All Users (Employee)\n")
 	fmt.Printf("32. Add Employee (Employee)\n")
-	fmt.Printf("33. Update User Email By ID (Employee)\n")
+	fmt.Printf("33. Update User Name By ID (Employee)\n")
 	fmt.Printf("34. Delete User By ID (Employee)\n")
+	fmt.Printf("35. Update User Email By ID (Employee)\n")
 
 	screenLine(width)
 
@@ -283,22 +284,22 @@ func main() {
 				fmt.Println("Forbidden!")
 				return
 			}
-			fmt.Println("Update User Email By ID (Employee)")
+			fmt.Println("Update User Name By ID (Employee)")
 
 			userController.GetAllUsers()
 
 			var inputUserId string
-			var inputUserEmail string
+			var inputUserName string
 
 			fmt.Printf("Enter User ID : ")
 			scanner.Scan()
 			inputUserId = scanner.Text()
 
-			fmt.Printf("Enter New User Email : ")
+			fmt.Printf("Enter New User Name : ")
 			scanner.Scan()
-			inputUserEmail = scanner.Text()
+			inputUserName = scanner.Text()
 
-			userController.UpdateUserEmailById(inputUserId, inputUserEmail)
+			userController.UpdateUserNameById(inputUserId, inputUserName)
 
 			userController.GetAllUsers()
 		case 34:
@@ -315,6 +316,29 @@ func main() {
 			inputUserId = scanner.Text()
 
 			userController.DeleteUserById(inputUserId)
+
+			userController.GetAllUsers()
+		case 35:
+			if currentUser.Role != "employee" {
+				fmt.Println("Forbidden!")
+				return
+			}
+			fmt.Println("Update User Email By ID (Employee)")
+
+			userController.GetAllUsers()
+
+			var inputUserId string
+			var inputUserEmail string
+
+			fmt.Printf("Enter User ID : ")
+			scanner.Scan()
+			inputUserId = scanner.Text()
+
+			fmt.Printf("Enter New User Email : ")
+			scanner.Scan()
+			inputUserEmail = scanner.Text()
+
+			userController.UpdateUserEmailById(inputUserId, inputUserEmail)
 
 			userController.GetAllUsers()
 
