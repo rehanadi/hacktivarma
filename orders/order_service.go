@@ -268,6 +268,53 @@ func (s *OrderService) GetUndeliveredOrders() ([]entity.Order, error) {
 	return orders, nil
 }
 
+func (s *OrderService) GetReportOrders() ([]entity.ReportOrder, error) {
+	var reportOrders []entity.ReportOrder
+
+	query := `
+		SELECT date(a.created_at)::text date,
+					count(a.id) total_order_all,
+					count(case when a.payment_status = 'unpaid' then 1 end) total_order_pending,
+					count(case when a.payment_status = 'paid' then 1 end) total_order_success,
+					count(case when a.payment_status = 'failed' then 1 end) total_order_failed,
+					coalesce(sum(a.total_price), 0) amount_order_all,
+					coalesce(sum(case when a.payment_status = 'unpaid' then a.total_price end), 0) amount_order_pending,
+					coalesce(sum(case when a.payment_status = 'paid' then a.total_price end), 0) amount_order_success,
+					coalesce(sum(case when a.payment_status = 'failed' then a.total_price end), 0) amount_order_failed
+		FROM orders a
+		GROUP BY date(a.created_at)
+		ORDER BY date(a.created_at)
+	`
+
+	rows, err := s.DB.Query(query)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var reportOrder entity.ReportOrder
+
+		err := rows.Scan(
+			&reportOrder.Date,
+			&reportOrder.TotalOrderAll,
+			&reportOrder.TotalOrderPending,
+			&reportOrder.TotalOrderSuccess,
+			&reportOrder.TotalOrderFailed,
+			&reportOrder.AmountOrderAll,
+			&reportOrder.AmountOrderPending,
+			&reportOrder.AmountOrderSuccess,
+			&reportOrder.AmountOrderFailed,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		reportOrders = append(reportOrders, reportOrder)
+	}
+
+	return reportOrders, nil
+}
+
 func (s *OrderService) AddOrder(newOrder entity.Order) error {
 	// check quantity
 	if newOrder.Quantity <= 0 {
