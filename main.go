@@ -12,9 +12,13 @@ import (
 	"hacktivarma/users"
 )
 
-func showMenuCustomer(currentUser entity.User) {
+func showMenuCustomer(currentUser entity.User, uc *users.UserController) {
+	user, err := uc.FindUserById(currentUser.Id)
+	if err != nil {
+		fmt.Println(err)
+	}
 	fmt.Printf("\n\n\t -- Hacktivarma -- \n\n")
-	fmt.Printf("Welcome, %-15s %s'\n\n", currentUser.Name, fmt.Sprintf("Role : '"+currentUser.Role))
+	fmt.Printf("Welcome, %-15s %s'\n\n", user.Name, fmt.Sprintf("Role : '"+user.Role))
 	fmt.Printf("1. All Drugs\n")
 
 	fmt.Printf("\n0. Exit \n")
@@ -28,10 +32,14 @@ func screenLine(width int) {
 	fmt.Println("")
 }
 
-func showMenuEmployee(currentUser entity.User) {
+func showMenuEmployee(currentUser entity.User, uc *users.UserController) {
 	width := 32
+	user, err := uc.FindUserById(currentUser.Id)
+	if err != nil {
+		fmt.Println(err)
+	}
 	fmt.Printf("\n\n\t -- Hacktivarma -- \n\n")
-	fmt.Printf("Hello, %-15s %s'\n\n", currentUser.Name, fmt.Sprintf("Role : '"+currentUser.Role))
+	fmt.Printf("Hello, %-15s %s'\n\n", user.Name, fmt.Sprintf("Role : '"+user.Role))
 	fmt.Printf("21. All Drugs (Employee)\n")
 	fmt.Printf("22. Add Drug (Employee)\n")
 	fmt.Printf("23. Update Drug Stock (Employee)\n")
@@ -135,9 +143,9 @@ func main() {
 	for {
 
 		if currentUser.Role == "customer" {
-			showMenuCustomer(currentUser)
+			showMenuCustomer(currentUser, userController)
 		} else if currentUser.Role == "employee" {
-			showMenuEmployee(currentUser)
+			showMenuEmployee(currentUser, userController)
 		}
 
 		fmt.Printf("\nPilih menu : ")
