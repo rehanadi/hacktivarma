@@ -13,7 +13,7 @@ import (
 )
 
 func showMenuCustomer(currentUser entity.User, uc *users.UserController) {
-	user, err := uc.FindUserById(currentUser.Id)
+	user, err := uc.GetUserById(currentUser.Id)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -34,7 +34,7 @@ func screenLine(width int) {
 
 func showMenuEmployee(currentUser entity.User, uc *users.UserController) {
 	width := 32
-	user, err := uc.FindUserById(currentUser.Id)
+	user, err := uc.GetUserById(currentUser.Id)
 	if err != nil {
 		fmt.Println(err)
 	}

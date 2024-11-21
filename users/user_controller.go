@@ -89,8 +89,8 @@ func (uc *UserController) UpdateUserNameById(userId, updatedName string) {
 	fmt.Println("Update success :", userId, updatedName)
 }
 
-func (uc *UserController) FindUserById(userId string) (*entity.User, error) {
-	user, err := uc.UserService.FindUserById(userId)
+func (uc *UserController) GetUserById(userId string) (*entity.User, error) {
+	user, err := uc.UserService.GetUserById(userId)
 	if err != nil {
 		fmt.Println("Error find user :", err)
 		return nil, err

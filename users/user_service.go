@@ -207,7 +207,7 @@ func (s *UserService) UpdateUserNameById(userId string, updatedName string) erro
 	return nil
 }
 
-func (s *UserService) FindUserById(userId string) (*entity.User, error) {
+func (s *UserService) GetUserById(userId string) (*entity.User, error) {
 
 	var user entity.User
 
