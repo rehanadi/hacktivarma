@@ -9,10 +9,12 @@ import (
 	"hacktivarma/db"
 	"hacktivarma/drugs"
 	entity "hacktivarma/entities"
+	"hacktivarma/orders"
 	"hacktivarma/users"
 )
 
 func showMenuCustomer(currentUser entity.User, uc *users.UserController) {
+	width := 32
 	user, err := uc.GetUserById(currentUser.Id)
 	if err != nil {
 		fmt.Println(err)
@@ -21,8 +23,16 @@ func showMenuCustomer(currentUser entity.User, uc *users.UserController) {
 	fmt.Printf("Welcome, %-15s %s'\n\n", user.Name, fmt.Sprintf("Role : '"+user.Role))
 	fmt.Printf("1. All Drugs\n")
 
-	fmt.Printf("\n0. Exit \n")
+	screenLine(width)
 
+	fmt.Printf("101. All Orders (Customer)\n")
+	fmt.Printf("102. Add Order (Customer)\n")
+	fmt.Printf("103. Pay Order (Customer)\n")
+	fmt.Printf("104. Delete Order (Customer)\n")
+
+	screenLine(width)
+
+	fmt.Printf("\n0. Exit \n")
 }
 
 func screenLine(width int) {
@@ -55,6 +65,12 @@ func showMenuEmployee(currentUser entity.User, uc *users.UserController) {
 
 	screenLine(width)
 
+	fmt.Printf("41. All Orders (Employee)\n")
+	fmt.Printf("42. Deliver Order (Employee)\n")
+	fmt.Printf("43. View Report Orders (Employee)\n")
+
+	screenLine(width)
+
 	fmt.Printf("\n0. Exit  (Employee)\n")
 }
 
@@ -70,6 +86,9 @@ func main() {
 
 	userService := users.NewUserService(db)
 	userController := users.NewUserController(userService)
+
+	orderService := orders.NewOrderService(db)
+	orderController := orders.NewOrderController(orderService)
 
 	var inputMenu int
 	var inputAuth int
@@ -349,6 +368,154 @@ func main() {
 			userController.UpdateUserEmailById(inputUserId, inputUserEmail)
 
 			userController.GetAllUsers()
+
+		case 41:
+			if currentUser.Role != "employee" {
+				fmt.Println("Forbidden!")
+				return
+			}
+			fmt.Println("ALL ORDERS (Employee)")
+			orderController.GetAllOrders(nil)
+
+		case 42:
+			if currentUser.Role != "employee" {
+				fmt.Println("Forbidden!")
+				return
+			}
+			fmt.Println("DELIVER ORDER (Employee)")
+
+			orders, err := orderController.GetUndeliveredOrders()
+
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+
+			if len(orders) == 0 {
+				fmt.Println("No undelivered order to deliver")
+				continue
+			}
+
+			var inputOrderID string
+
+			fmt.Printf("Enter Order ID : ")
+			scanner.Scan()
+			inputOrderID = scanner.Text()
+
+			orderController.DeliverOrder(inputOrderID)
+
+		case 43:
+			if currentUser.Role != "employee" {
+				fmt.Println("Forbidden!")
+				return
+			}
+			fmt.Println("VIEW REPORT ORDERS (Employee)")
+			orderController.GetReportOrders()
+
+		case 101:
+			if currentUser.Role != "customer" {
+				fmt.Println("Forbidden!")
+				return
+			}
+			fmt.Println("ALL ORDERS (Customer)")
+			orderController.GetAllOrders(currentUser.Id)
+
+		case 102:
+			if currentUser.Role != "customer" {
+				fmt.Println("Forbidden!")
+				return
+			}
+			fmt.Println("ADD ORDER (Customer)")
+			drugController.GetAllDrugs()
+
+			var inputDrugID string
+			var inputQuantity int
+
+			fmt.Printf("Enter Drug ID : ")
+			scanner.Scan()
+			inputDrugID = scanner.Text()
+
+			fmt.Printf("Enter Quantity : ")
+			fmt.Scanln(&inputQuantity)
+
+			order := entity.Order{
+				UserId:   currentUser.Id,
+				DrugId:   inputDrugID,
+				Quantity: inputQuantity,
+			}
+
+			err := orderController.AddOrder(order)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+			orderController.GetAllOrders(currentUser.Id)
+
+		case 103:
+			if currentUser.Role != "customer" {
+				fmt.Println("Forbidden!")
+				return
+			}
+			fmt.Println("PAY ORDER (Customer)")
+
+			orders, err := orderController.GetUnpaidOrders(currentUser.Id)
+
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+
+			if len(orders) == 0 {
+				fmt.Println("No unpaid order to pay")
+				continue
+			}
+
+			var inputOrderID, inputPaymentMethod string
+			var inputPaymentAmount float64
+
+			fmt.Printf("Enter Order ID : ")
+			scanner.Scan()
+			inputOrderID = scanner.Text()
+
+			fmt.Printf("Enter Payment Method : ")
+			scanner.Scan()
+			inputPaymentMethod = scanner.Text()
+
+			fmt.Printf("Enter Payment Amount : ")
+			fmt.Scanln(&inputPaymentAmount)
+
+			orderController.PayOrder(inputOrderID, inputPaymentMethod, inputPaymentAmount, currentUser.Id)
+
+			orderController.GetAllOrders(currentUser.Id)
+
+		case 104:
+			if currentUser.Role != "customer" {
+				fmt.Println("Forbidden!")
+				return
+			}
+			fmt.Println("DELETE ORDER (Customer)")
+
+			orders, err := orderController.GetFailedOrders(currentUser.Id)
+
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+
+			if len(orders) == 0 {
+				fmt.Println("No failed order to delete")
+				continue
+			}
+
+			var inputOrderID string
+
+			fmt.Printf("Enter Order ID : ")
+			scanner.Scan()
+			inputOrderID = scanner.Text()
+
+			orderController.DeleteOrderById(inputOrderID, currentUser.Id)
+
+			orderController.GetAllOrders(currentUser.Id)
 
 		case 0:
 			fmt.Printf("\n\tThank You!\n\n")
