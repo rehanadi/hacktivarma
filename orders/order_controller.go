@@ -62,6 +62,27 @@ func (oc *OrderController) GetUnpaidOrders(userId string) (orders []entity.Order
 	return
 }
 
+func (oc *OrderController) GetFailedOrders(userId string) (orders []entity.Order, err error) {
+	width := 80
+	orders, err = oc.OrderService.GetFailedOrders(userId)
+	if err != nil {
+		fmt.Println("Error :", err)
+	}
+
+	screenLine(width)
+	fmt.Printf("%-8s | %-14s | %-14s | %-8s | %-8s | %-12s | %-20s | %-14s | %-14s | %-20s | %-15s | %-20s\n",
+		"ID", "User", "Drug", "Quantity", "Price", "Total", "Order At", "Payment Method", "Payment Status", "Payment At", "Delivery Status", "Delivered At")
+	screenLine(width)
+
+	for _, order := range orders {
+		fmt.Printf("%-8v | %-14v | %-14v | %-8v | Rp %-8.0f | Rp %-12.0f | %-20v | %-14v | %-14v | %-20v | %-15v | %-20v\n",
+			order.Id, order.UserName, order.DrugName, order.Quantity, order.Price*1000, order.TotalPrice*1000, order.CreatedAt.Format("2006-01-02"), order.PaymentMethod, order.PaymentStatus, order.PaymentAt.Format("2006-01-02"), order.DeliveryStatus, order.DeliveredAt.Format("2006-01-02"))
+	}
+
+	screenLine(width)
+	return
+}
+
 func (oc *OrderController) AddOrder(newOrder entity.Order) error {
 	err := oc.OrderService.AddOrder(newOrder)
 
@@ -102,7 +123,7 @@ func (oc *OrderController) PayOrder(
 		return
 	}
 
-	fmt.Println("Payment success :", orderId)
+	fmt.Println("Payment order success :", orderId)
 }
 
 func (oc *OrderController) DeliverOrder(orderId string) {
@@ -118,13 +139,15 @@ func (oc *OrderController) DeliverOrder(orderId string) {
 		return
 	}
 
-	fmt.Println("Deliver success :", orderId)
+	fmt.Println("Deliver order success :", orderId)
 }
 
-func (oc *OrderController) DeleteOrderById(orderId string) {
-	err := oc.OrderService.DeleteOrderById(orderId)
+func (oc *OrderController) DeleteOrderById(orderId string, userId string) {
+	err := oc.OrderService.DeleteOrderById(orderId, userId)
 
 	if err != nil {
 		fmt.Println("Error delete order :", err)
 	}
+
+	fmt.Println("Delete order success :", orderId)
 }
