@@ -392,7 +392,7 @@ func main() {
 			err := orderController.AddOrder(order)
 			if err != nil {
 				fmt.Println(err)
-				return
+				continue
 			}
 			orderController.GetAllOrders(currentUser.Id)
 
@@ -402,7 +402,18 @@ func main() {
 				return
 			}
 			fmt.Println("PAY ORDER (Customer)")
-			orderController.GetUnpaidOrders(currentUser.Id)
+
+			orders, err := orderController.GetUnpaidOrders(currentUser.Id)
+
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+
+			if len(orders) == 0 {
+				fmt.Println("No unpaid order")
+				continue
+			}
 
 			var inputOrderID, inputPaymentMethod string
 			var inputPaymentAmount float64
