@@ -30,11 +30,11 @@ func (uc *UserController) GetAllUsers() {
 	}
 
 	screenLine(width)
-	fmt.Printf("%-8s | %-10s | %-8v | %-18s | %-14v\n", "ID", "User Name", "Role", "Email", "Password")
+	fmt.Printf("%-8s | %-15s | %-8v | %-20s | %-10v\n", "ID", "User Name", "Role", "Email", "Location")
 	screenLine(width)
 
 	for _, user := range allUsers {
-		fmt.Printf("%-8v | %-10v | %-8v | %-18s | %-14v\n", user.Id, user.Name, user.Role, user.Email, user.Password)
+		fmt.Printf("%-8v | %-15v | %-8v | %-20s | %-10v\n", user.Id, user.Name, user.Role, user.Email, user.Location)
 	}
 
 	screenLine(width)
@@ -96,4 +96,48 @@ func (uc *UserController) GetUserById(userId string) (*entity.User, error) {
 		return nil, err
 	}
 	return user, nil
+}
+
+func (uc *UserController) GetAllUsersByLocation(inputLocation string) {
+
+	width := 67
+	allUsers, err := uc.UserService.GetAllUsersByLocation(inputLocation)
+	if err != nil {
+		fmt.Println("Error :", err)
+		return
+	}
+
+	if len(allUsers) <= 0 {
+		fmt.Printf("\n\tThere are no users with location '%s'\n", inputLocation)
+		return
+	}
+
+	screenLine(width)
+	fmt.Printf("%-8s | %-15s | %-8v | %-20s | %-10v\n", "ID", "User Name", "Role", "Email", "Location")
+	screenLine(width)
+
+	for _, user := range allUsers {
+		fmt.Printf("%-8v | %-15v | %-8v | %-20s | %-10v\n", user.Id, user.Name, user.Role, user.Email, user.Location)
+	}
+
+	screenLine(width)
+
+}
+
+func (uc *UserController) GetUserStatistics() {
+	width := 35
+	userStatistics, err := uc.UserService.GetUserStatistics()
+	if err != nil {
+		fmt.Println("Error get statistics :", err)
+		return
+	}
+
+	fmt.Printf("\n\tUsers Registered\n\n")
+	screenLine(width)
+	fmt.Printf("| %-7s | %-9s | %-9v |\n", "Total", "Employee", "Customer")
+	screenLine(width)
+
+	fmt.Printf("| %-7d | %-9d | %-9d |\n", userStatistics.Total, userStatistics.Employee, userStatistics.Customer)
+	screenLine(width)
+
 }

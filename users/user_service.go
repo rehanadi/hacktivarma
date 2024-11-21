@@ -24,7 +24,7 @@ func (s *UserService) GetAllUsers() ([]entity.User, error) {
 
 	var users []entity.User
 
-	query := "SELECT id, name, role, email, password, created_at FROM users"
+	query := "SELECT users.id, users.name, role, email, password, locations.name as location, created_at FROM users join locations on users.location=locations.id ORDER BY created_at"
 	rows, err := s.DB.Query(query)
 	if err != nil {
 		return nil, err
@@ -36,6 +36,7 @@ func (s *UserService) GetAllUsers() ([]entity.User, error) {
 		var role string
 		var email string
 		var password string
+		var location string
 		var createdAt time.Time
 
 		rows.Scan(
@@ -44,6 +45,7 @@ func (s *UserService) GetAllUsers() ([]entity.User, error) {
 			&role,
 			&email,
 			&password,
+			&location,
 			&createdAt,
 		)
 
@@ -53,6 +55,7 @@ func (s *UserService) GetAllUsers() ([]entity.User, error) {
 			Role:      role,
 			Email:     email,
 			Password:  password,
+			Location:  location,
 			CreatedAt: createdAt,
 		})
 	}
@@ -250,4 +253,58 @@ func (s *UserService) GetUserById(userId string) (*entity.User, error) {
 	}
 
 	return &user, nil
+}
+
+func (s *UserService) GetAllUsersByLocation(inputLocation string) ([]entity.User, error) {
+
+	var users []entity.User
+
+	query := "SELECT users.id, users.name, role, email, password, locations.name as location, created_at FROM users JOIN locations ON users.location=locations.id WHERE locations.name = $1 ORDER BY created_at"
+	rows, err := s.DB.Query(query, inputLocation)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var id string
+		var name string
+		var role string
+		var email string
+		var password string
+		var location string
+		var createdAt time.Time
+
+		rows.Scan(
+			&id,
+			&name,
+			&role,
+			&email,
+			&password,
+			&location,
+			&createdAt,
+		)
+
+		users = append(users, entity.User{
+			Id:        id,
+			Name:      name,
+			Role:      role,
+			Email:     email,
+			Password:  password,
+			Location:  location,
+			CreatedAt: createdAt,
+		})
+	}
+
+	return users, nil
+}
+
+func (s *UserService) GetUserStatistics() (*entity.UserStatistics, error) {
+	var userStatistics entity.UserStatistics
+
+	query := "SELECT COUNT(*) AS total_users, COUNT(CASE WHEN role = 'customer' THEN 1 END) AS customer, COUNT(CASE WHEN role = 'employee' THEN 1 END) AS employee FROM users"
+	err := s.DB.QueryRow(query).Scan(&userStatistics.Total, &userStatistics.Customer, &userStatistics.Employee)
+	if err != nil {
+		return nil, err
+	}
+	return &userStatistics, err
 }

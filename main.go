@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"os/exec"
+	"runtime"
 	"time"
 
 	"hacktivarma/db"
@@ -35,13 +37,6 @@ func showMenuCustomer(currentUser entity.User, uc *users.UserController) {
 	fmt.Printf("\n0. Exit \n")
 }
 
-func screenLine(width int) {
-	for i := 0; i < width; i++ {
-		fmt.Printf("-")
-	}
-	fmt.Println("")
-}
-
 func showMenuEmployee(currentUser entity.User, uc *users.UserController) {
 	width := 32
 	user, err := uc.GetUserById(currentUser.Id)
@@ -62,6 +57,8 @@ func showMenuEmployee(currentUser entity.User, uc *users.UserController) {
 	fmt.Printf("33. Update User Name By ID (Employee)\n")
 	fmt.Printf("34. Delete User By ID (Employee)\n")
 	fmt.Printf("35. Update User Email By ID (Employee)\n")
+	fmt.Printf("36. Get User Statistics (Employee)\n")
+	fmt.Printf("37. Show Users By Location (Employee)\n")
 
 	screenLine(width)
 
@@ -72,6 +69,26 @@ func showMenuEmployee(currentUser entity.User, uc *users.UserController) {
 	screenLine(width)
 
 	fmt.Printf("\n0. Exit  (Employee)\n")
+}
+
+func screenLine(width int) {
+	for i := 0; i < width; i++ {
+		fmt.Printf("-")
+	}
+	fmt.Println("")
+}
+
+func clearScreen() {
+	switch runtime.GOOS {
+	case "windows":
+		cmd := exec.Command("cmd", "/c", "cls")
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	default:
+		cmd := exec.Command("clear")
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	}
 }
 
 func main() {
@@ -173,6 +190,7 @@ func main() {
 
 		fmt.Printf("\nPilih menu : ")
 		fmt.Scanln(&inputMenu)
+		clearScreen()
 
 		switch inputMenu {
 		case 1:
@@ -376,6 +394,22 @@ func main() {
 			userController.UpdateUserEmailById(inputUserId, inputUserEmail)
 
 			userController.GetAllUsers()
+		case 36:
+			if currentUser.Role != "employee" {
+				fmt.Println("Forbidden!")
+				return
+			}
+			userController.GetUserStatistics()
+
+		case 37:
+			if currentUser.Role != "employee" {
+				fmt.Println("Forbidden!")
+				return
+			}
+			fmt.Printf("Enter location : ")
+			scanner.Scan()
+			inputLocation = scanner.Text()
+			userController.GetAllUsersByLocation(inputLocation)
 
 		case 41:
 			if currentUser.Role != "employee" {
