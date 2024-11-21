@@ -144,6 +144,68 @@ func (s *OrderService) GetUnpaidOrders(userId string) ([]entity.Order, error) {
 	return orders, nil
 }
 
+func (s *OrderService) GetFailedOrders(userId string) ([]entity.Order, error) {
+	var orders []entity.Order
+
+	query := `
+		SELECT a.id, a.user_id, a.drug_id, a.quantity, a.price, a.total_price,
+					a.payment_method, a.payment_status, a.payment_at, a.delivery_status, a.delivered_at,
+					a.created_at, a.updated_at, b.name user_name, c.name drug_name
+		FROM orders a, users b, drugs c
+		WHERE a.user_id = b.id
+		AND a.drug_id = c.id
+		AND a.payment_status = 'failed'
+		AND a.user_id = $1
+		ORDER BY a.created_at
+	`
+
+	rows, err := s.DB.Query(query, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var order entity.Order
+		var paymentMethod *string
+		var paymentAt, deliveredAt *time.Time
+
+		err := rows.Scan(
+			&order.Id,
+			&order.UserId,
+			&order.DrugId,
+			&order.Quantity,
+			&order.Price,
+			&order.TotalPrice,
+			&paymentMethod,
+			&order.PaymentStatus,
+			&paymentAt,
+			&order.DeliveryStatus,
+			&deliveredAt,
+			&order.CreatedAt,
+			&order.UpdatedAt,
+			&order.UserName,
+			&order.DrugName,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		if paymentMethod != nil {
+			order.PaymentMethod = *paymentMethod
+		}
+		if paymentAt != nil {
+			order.PaymentAt = *paymentAt
+		}
+		if deliveredAt != nil {
+			order.DeliveredAt = *deliveredAt
+		}
+
+		orders = append(orders, order)
+	}
+
+	return orders, nil
+}
+
 func (s *OrderService) AddOrder(newOrder entity.Order) error {
 	// check quantity
 	if newOrder.Quantity <= 0 {
@@ -284,16 +346,24 @@ func (s *OrderService) DeliverOrder(orderId string) error {
 	return nil
 }
 
-func (s *OrderService) DeleteOrderById(orderId string) error {
+func (s *OrderService) DeleteOrderById(orderId string, userId string) error {
 	var order entity.Order
 
-	query := "SELECT id FROM orders WHERE id = $1"
+	query := "SELECT id, user_id, payment_status FROM orders WHERE id = $1"
 
-	err := s.DB.QueryRow(query, orderId).Scan(&order.Id)
+	err := s.DB.QueryRow(query, orderId).Scan(&order.Id, &order.UserId, &order.PaymentStatus)
 
 	if err != nil {
 		fmt.Printf("Order with ID : %s not found", orderId)
 		return errors.New("order not found")
+	}
+
+	if order.UserId != userId {
+		return errors.New("order is not yours")
+	}
+
+	if order.PaymentStatus != "failed" {
+		return errors.New("only failed order can be deleted")
 	}
 
 	deleteQuery := "DELETE FROM orders WHERE id = $1"
