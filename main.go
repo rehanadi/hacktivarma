@@ -404,6 +404,14 @@ func main() {
 
 			orderController.DeliverOrder(inputOrderID)
 
+		case 43:
+			if currentUser.Role != "employee" {
+				fmt.Println("Forbidden!")
+				return
+			}
+			fmt.Println("VIEW REPORT ORDERS (Employee)")
+			orderController.GetReportOrders()
+
 		case 101:
 			if currentUser.Role != "customer" {
 				fmt.Println("Forbidden!")
