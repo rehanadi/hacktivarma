@@ -79,3 +79,12 @@ func (uc *UserController) UpdateUserEmailById(userId, updatedEmail string) {
 	}
 	fmt.Println("Update success :", userId, updatedEmail)
 }
+
+func (uc *UserController) UpdateUserNameById(userId, updatedName string) {
+	err := uc.UserService.UpdateUserNameById(userId, updatedName)
+	if err != nil {
+		fmt.Println("Error update name :", err)
+		return
+	}
+	fmt.Println("Update success :", userId, updatedName)
+}
