@@ -57,42 +57,6 @@ func (s *DrugService) GetAllDrugs() ([]entity.Drug, error) {
 	return drugs, nil
 }
 
-// func (s *DrugService) AddDrug(
-// 	name string, dose float64, form string, stock int, price float64, expired_date string, category int,
-// ) error {
-
-// 	var drug entity.Drug
-
-// 	query := "SELECT id, name, dose, form, stock, price, expired_date, category, created_at, updated_at FROM drug WHERE name = $1"
-
-// 	err := s.DB.QueryRow(query, name).Scan(
-// 		&drug.Id,
-// 		&drug.Name,
-// 		&drug.Dose,
-// 		&drug.Form,
-// 		&drug.Stock,
-// 		&drug.Price,
-// 		&drug.ExpiredDate,
-// 		&drug.Category,
-// 		&drug.CreatedAt,
-// 		&drug.UpdatedAt,
-// 	)
-
-// 	if len(drug.Id) != 0 {
-// 		return errors.New("drug already registered")
-// 	}
-
-// 	insertQuery := "INSERT INTO drugs (name, dose, form, stock, price, expired_date, category) VALUES ($1, $2, $3, $4, $5, $6, $7)"
-// 	_, err = s.DB.Exec(insertQuery, name, dose, form, stock, price, expired_date, category)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	fmt.Printf("Drug Created : %s\n", name)
-
-// 	return nil
-// }
-
 func (s *DrugService) AddDrug(drug entity.Drug) error {
 	query := "SELECT id FROM drugs WHERE name = $1"
 	var existingID string
@@ -122,7 +86,6 @@ func (s *DrugService) AddDrug(drug entity.Drug) error {
 }
 
 func (s *DrugService) UpdateDrugStock(drugId string, updatedStock int) error {
-
 	var drug entity.Drug
 
 	query := "SELECT id, name, dose, form, stock, price, expired_date, category, created_at, updated_at FROM drugs WHERE id = $1"
@@ -147,6 +110,7 @@ func (s *DrugService) UpdateDrugStock(drugId string, updatedStock int) error {
 
 	updateQuery := "UPDATE drugs SET stock = $1 WHERE id = $2"
 	_, err = s.DB.Exec(updateQuery, updatedStock, drugId)
+
 	if err != nil {
 		return err
 	}
@@ -156,7 +120,6 @@ func (s *DrugService) UpdateDrugStock(drugId string, updatedStock int) error {
 }
 
 func (s *DrugService) DeleteDrugById(drugId string) error {
-
 	var drug entity.Drug
 
 	query := "SELECT id, name, dose, form, stock, price, expired_date, category, created_at, updated_at FROM drugs WHERE id = $1"
@@ -181,6 +144,7 @@ func (s *DrugService) DeleteDrugById(drugId string) error {
 
 	updateQuery := "DELETE FROM drugs WHERE id = $1"
 	_, err = s.DB.Exec(updateQuery, drugId)
+
 	if err != nil {
 		return err
 	}
