@@ -202,9 +202,9 @@ func (s *OrderService) PayOrder(
 ) error {
 	var order entity.Order
 
-	query := "SELECT id, total_price, payment_status, user_id FROM orders WHERE id = $1"
+	query := "SELECT id, total_price, payment_status, user_id, drug_id, quantity FROM orders WHERE id = $1"
 
-	err := s.DB.QueryRow(query, orderId).Scan(&order.Id, &order.TotalPrice, &order.PaymentStatus, &order.UserId)
+	err := s.DB.QueryRow(query, orderId).Scan(&order.Id, &order.TotalPrice, &order.PaymentStatus, &order.UserId, &order.DrugId, &order.Quantity)
 
 	if err != nil {
 		fmt.Printf("Order with ID : %s not found", orderId)
