@@ -206,6 +206,68 @@ func (s *OrderService) GetFailedOrders(userId string) ([]entity.Order, error) {
 	return orders, nil
 }
 
+func (s *OrderService) GetUndeliveredOrders() ([]entity.Order, error) {
+	var orders []entity.Order
+
+	query := `
+		SELECT a.id, a.user_id, a.drug_id, a.quantity, a.price, a.total_price,
+					a.payment_method, a.payment_status, a.payment_at, a.delivery_status, a.delivered_at,
+					a.created_at, a.updated_at, b.name user_name, c.name drug_name
+		FROM orders a, users b, drugs c
+		WHERE a.user_id = b.id
+		AND a.drug_id = c.id
+		AND a.payment_status = 'paid'
+		and a.delivery_status = 'pending'
+		ORDER BY a.created_at
+	`
+
+	rows, err := s.DB.Query(query)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var order entity.Order
+		var paymentMethod *string
+		var paymentAt, deliveredAt *time.Time
+
+		err := rows.Scan(
+			&order.Id,
+			&order.UserId,
+			&order.DrugId,
+			&order.Quantity,
+			&order.Price,
+			&order.TotalPrice,
+			&paymentMethod,
+			&order.PaymentStatus,
+			&paymentAt,
+			&order.DeliveryStatus,
+			&deliveredAt,
+			&order.CreatedAt,
+			&order.UpdatedAt,
+			&order.UserName,
+			&order.DrugName,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		if paymentMethod != nil {
+			order.PaymentMethod = *paymentMethod
+		}
+		if paymentAt != nil {
+			order.PaymentAt = *paymentAt
+		}
+		if deliveredAt != nil {
+			order.DeliveredAt = *deliveredAt
+		}
+
+		orders = append(orders, order)
+	}
+
+	return orders, nil
+}
+
 func (s *OrderService) AddOrder(newOrder entity.Order) error {
 	// check quantity
 	if newOrder.Quantity <= 0 {
@@ -323,17 +385,21 @@ func (s *OrderService) PayOrder(
 func (s *OrderService) DeliverOrder(orderId string) error {
 	var order entity.Order
 
-	query := "SELECT id, delivery_status FROM orders WHERE id = $1"
+	query := "SELECT id, payment_status, delivery_status FROM orders WHERE id = $1"
 
-	err := s.DB.QueryRow(query, orderId).Scan(&order.Id, &order.DeliveryStatus)
+	err := s.DB.QueryRow(query, orderId).Scan(&order.Id, &order.PaymentStatus, &order.DeliveryStatus)
 
 	if err != nil {
 		fmt.Printf("Order with ID : %s not found", orderId)
 		return errors.New("order not found")
 	}
 
-	if order.DeliveryStatus == "delivered" {
-		return errors.New("order already delivered")
+	if order.DeliveryStatus != "pending" {
+		return errors.New("only undelivered order can be delivered")
+	}
+
+	if order.PaymentStatus != "paid" {
+		return errors.New("only paid order can be delivered")
 	}
 
 	updateQuery := "UPDATE orders SET delivery_status = $1, delivered_at = $2 WHERE id = $3"
