@@ -12,8 +12,16 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type UserRepository interface {
+	FindById(userId string) (entity.User, error)
+	DeleteById(userId string) error
+	CreateUser(user entity.User) (entity.User, error)
+	UpdateUser(user entity.User) (entity.User, error)
+}
+
 type UserService struct {
-	DB *sql.DB
+	DB             *sql.DB
+	userRepository UserRepository
 }
 
 func NewUserService(db *sql.DB) *UserService {
@@ -307,4 +315,54 @@ func (s *UserService) GetUserStatistics() (*entity.UserStatistics, error) {
 		return nil, err
 	}
 	return &userStatistics, err
+}
+
+func (s *UserService) GetOneUser(userId string) (*entity.User, error) {
+
+	user, err := s.userRepository.FindById(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func (s *UserService) DeleteById(userId string) error {
+
+	_, err := s.userRepository.FindById(userId)
+	if err != nil {
+		return err
+	}
+
+	return s.userRepository.DeleteById(userId)
+}
+
+func (s *UserService) CreateUser(user entity.User) (*entity.User, error) {
+
+	if user.Name == "" {
+		return nil, fmt.Errorf("name cannot be empty")
+	}
+
+	user, err := s.userRepository.CreateUser(user)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (s *UserService) UpdateUser(user entity.User) (*entity.User, error) {
+	if user.Name == "" {
+		return nil, fmt.Errorf("name cannot be empty")
+	}
+
+	user, err := s.userRepository.FindById(user.Id)
+	if err != nil {
+		return nil, err
+	}
+	updatedUser, err := s.userRepository.UpdateUser(user)
+	if err != nil {
+		return nil, err
+	}
+
+	return &updatedUser, nil
 }
