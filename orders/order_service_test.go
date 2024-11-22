@@ -118,3 +118,28 @@ func TestOrderServiceCreateOrder_Success(t *testing.T) {
 
 	mockRepository.AssertExpectations(t)
 }
+
+func TestOrderServiceCreateOrder_ValidationError(t *testing.T) {
+	order := entity.Order{
+		Id:         "123456",
+		UserId:     "",
+		DrugId:     "222222",
+		Quantity:   0,
+		Price:      1000,
+		TotalPrice: 2000,
+	}
+
+	mockRepository := new(MockOrderRepository)
+
+	orderService := &OrderService{
+		orderRepository: mockRepository,
+	}
+
+	result, err := orderService.CreateOrder(order)
+
+	assert.NotNil(t, err)
+	assert.Equal(t, "quantity must be greater than 0", err.Error(), "error message should be 'quantity must be greater than 0'")
+	assert.Nil(t, result)
+
+	mockRepository.AssertExpectations(t)
+}
