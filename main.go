@@ -185,6 +185,7 @@ func main() {
 				fmt.Println("Forbidden!")
 				return
 			}
+
 			fmt.Println("ADD DRUG (Employee)")
 
 			var inputDrugStock, inputDrugCategory int
@@ -229,13 +230,7 @@ func main() {
 				Category:    inputDrugCategory,
 			}
 
-			err = drugController.AddDrug(drug)
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-			drugController.GetAllDrugs()
-
+			drugController.AddDrug(drug)
 		case 24:
 			drugController.ShowExpiringDrugs()
 		case 25:
@@ -243,6 +238,7 @@ func main() {
 				fmt.Println("Forbidden!")
 				return
 			}
+
 			fmt.Println("Update DRUG Stock (Employee)")
 
 			drugController.GetAllDrugs()
@@ -258,12 +254,12 @@ func main() {
 			fmt.Scanln(&inputDrugStock)
 
 			drugController.UpdateDrugStock(inputDrugId, inputDrugStock)
-
 		case 26:
 			if currentUser.Role != "employee" {
 				fmt.Println("Forbidden!")
 				return
 			}
+
 			fmt.Println("Delete DRUG By ID (Employee)")
 
 			drugController.GetAllDrugs()
@@ -275,8 +271,6 @@ func main() {
 			inputDrugId = scanner.Text()
 
 			drugController.DeleteDrugById(inputDrugId)
-			drugController.GetAllDrugs()
-
 		case 31:
 			if currentUser.Role != "employee" {
 				fmt.Println("Forbidden!")

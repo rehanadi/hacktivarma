@@ -77,7 +77,11 @@ func (s *DrugService) FindDrugByID(drugID string) (entity.Drug, error) {
 	)
 
 	if err != nil {
-		return drug, fmt.Errorf("error retrieving drug: %v", err)
+		if err == sql.ErrNoRows {
+			return drug, fmt.Errorf("Drug with ID %s not found", drugID)
+		}
+
+		return drug, err
 	}
 
 	return drug, nil
@@ -158,31 +162,15 @@ func (s *DrugService) GetDrugsExpiringSoon() ([]entity.Drug, error) {
 	return drugs, nil
 }
 
-func (s *DrugService) UpdateDrugStock(drugId string, updatedStock int) error {
-	var drug entity.Drug
-
-	query := "SELECT id, name, dose, form, stock, price, expired_date, category, created_at, updated_at FROM drugs WHERE id = $1"
-
-	err := s.DB.QueryRow(query, drugId).Scan(
-		&drug.Id,
-		&drug.Name,
-		&drug.Dose,
-		&drug.Form,
-		&drug.Stock,
-		&drug.Price,
-		&drug.ExpiredDate,
-		&drug.Category,
-		&drug.CreatedAt,
-		&drug.UpdatedAt,
-	)
+func (s *DrugService) UpdateDrugStock(drugID string, updatedStock int) error {
+	err := s.checkAvailabilityDrug(drugID)
 
 	if err != nil {
-		fmt.Printf("Drug with ID : %s not found", drugId)
-		return errors.New("drug not found")
+		return fmt.Errorf(err.Error())
 	}
 
 	updateQuery := "UPDATE drugs SET stock = $1 WHERE id = $2"
-	_, err = s.DB.Exec(updateQuery, updatedStock, drugId)
+	_, err = s.DB.Exec(updateQuery, updatedStock, drugID)
 
 	if err != nil {
 		return err
@@ -191,36 +179,37 @@ func (s *DrugService) UpdateDrugStock(drugId string, updatedStock int) error {
 	return nil
 }
 
-func (s *DrugService) DeleteDrugById(drugId string) error {
-	var drug entity.Drug
-
-	query := "SELECT id, name, dose, form, stock, price, expired_date, category, created_at, updated_at FROM drugs WHERE id = $1"
-
-	err := s.DB.QueryRow(query, drugId).Scan(
-		&drug.Id,
-		&drug.Name,
-		&drug.Dose,
-		&drug.Form,
-		&drug.Stock,
-		&drug.Price,
-		&drug.ExpiredDate,
-		&drug.Category,
-		&drug.CreatedAt,
-		&drug.UpdatedAt,
-	)
+func (s *DrugService) DeleteDrugById(drugID string) error {
+	err := s.checkAvailabilityDrug(drugID)
 
 	if err != nil {
-		fmt.Printf("Drug with ID : %s not found", drugId)
-		return errors.New("drug not found")
+		return fmt.Errorf(err.Error())
 	}
 
 	updateQuery := "DELETE FROM drugs WHERE id = $1"
-	_, err = s.DB.Exec(updateQuery, drugId)
+	_, err = s.DB.Exec(updateQuery, drugID)
 
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
 
+func (s *DrugService) checkAvailabilityDrug(drugID string) error {
+	var drug entity.Drug
+
+	query := "SELECT id FROM drugs WHERE id = $1"
+
+	err := s.DB.QueryRow(query, drugID).Scan(&drug.Id)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return fmt.Errorf("Drug with ID %s not found", drugID)
+		}
+
+		return err
+	}
+
+	return nil
 }

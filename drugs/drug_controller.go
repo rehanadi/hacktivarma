@@ -47,6 +47,7 @@ func (dc *DrugController) FindDrugByID(drugID string) {
 
 	if err != nil {
 		fmt.Println("Error :", err)
+		return
 	}
 
 	if len(drug.CategoryName) > 10 {
@@ -62,16 +63,15 @@ func (dc *DrugController) FindDrugByID(drugID string) {
 	screenLine(width)
 }
 
-func (dc *DrugController) AddDrug(drug entity.Drug) error {
+func (dc *DrugController) AddDrug(drug entity.Drug) {
 	err := dc.DrugService.AddDrug(drug)
 
 	if err != nil {
 		fmt.Println("Error:", err)
-		return err
+		return
 	}
 
 	fmt.Println("Drug Created Successfully")
-	return nil
 }
 
 func (dc *DrugController) ShowExpiringDrugs() {
@@ -108,19 +108,20 @@ func (dc *DrugController) UpdateDrugStock(drugId string, updatedStock int) {
 	err := dc.DrugService.UpdateDrugStock(drugId, updatedStock)
 
 	if err != nil {
-		fmt.Println("Error update stock :", err)
+		fmt.Println("Error:", err)
 		return
 	}
 
-	fmt.Println("Update success :", drugId, updatedStock)
+	fmt.Printf("Successfully update drug with id: %s:", drugId)
 }
 
 func (dc *DrugController) DeleteDrugById(drugId string) {
 	err := dc.DrugService.DeleteDrugById(drugId)
 
 	if err != nil {
-		fmt.Println("Error delete drug :", err)
+		fmt.Println("Error:", err)
+		return
 	}
 
-	fmt.Printf("Successfully delete drug with id: %s :", drugId)
+	fmt.Printf("Successfully delete drug with id: %s", drugId)
 }
