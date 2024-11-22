@@ -218,15 +218,15 @@ func main() {
 
 		case 21:
 			if currentUser.Role != "employee" {
-				fmt.Println("Forbidden!")
-				return
+				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
+				break
 			}
 			fmt.Println("ALL DRUGS (Employee)")
 			drugController.GetAllDrugs()
 		case 22:
 			if currentUser.Role != "employee" {
-				fmt.Println("Forbidden!")
-				return
+				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
+				break
 			}
 			fmt.Println("ADD DRUG (Employee)")
 
@@ -283,8 +283,8 @@ func main() {
 
 		case 23:
 			if currentUser.Role != "employee" {
-				fmt.Println("Forbidden!")
-				return
+				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
+				break
 			}
 			fmt.Println("Update DRUG Stock (Employee)")
 
@@ -304,8 +304,8 @@ func main() {
 
 		case 24:
 			if currentUser.Role != "employee" {
-				fmt.Println("Forbidden!")
-				return
+				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
+				break
 			}
 			fmt.Println("Delete DRUG By ID (Employee)")
 
@@ -322,14 +322,14 @@ func main() {
 
 		case 31:
 			if currentUser.Role != "employee" {
-				fmt.Println("Forbidden!")
-				return
+				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
+				break
 			}
 			userController.GetAllUsers()
 		case 32:
 			if currentUser.Role != "employee" {
-				fmt.Println("Forbidden!")
-				return
+				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
+				break
 			}
 			fmt.Println("ADD EMPLOYEE (Employee)")
 			fmt.Printf("\nEnter name : ")
@@ -357,8 +357,8 @@ func main() {
 			}
 		case 33:
 			if currentUser.Role != "employee" {
-				fmt.Println("Forbidden!")
-				return
+				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
+				break
 			}
 			fmt.Println("Update User Name By ID (Employee)")
 
@@ -380,8 +380,8 @@ func main() {
 			userController.GetAllUsers()
 		case 34:
 			if currentUser.Role != "employee" {
-				fmt.Println("Forbidden!")
-				return
+				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
+				break
 			}
 			fmt.Println("Delete User By ID (Employee)")
 			userController.GetAllUsers()
@@ -402,8 +402,8 @@ func main() {
 
 		case 35:
 			if currentUser.Role != "employee" {
-				fmt.Println("Forbidden!")
-				return
+				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
+				break
 			}
 			fmt.Println("Update User Email By ID (Employee)")
 
@@ -425,15 +425,15 @@ func main() {
 			userController.GetAllUsers()
 		case 36:
 			if currentUser.Role != "employee" {
-				fmt.Println("Forbidden!")
-				return
+				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
+				break
 			}
 			userController.GetUserStatistics()
 
 		case 37:
 			if currentUser.Role != "employee" {
-				fmt.Println("Forbidden!")
-				return
+				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
+				break
 			}
 			fmt.Printf("Enter location : ")
 			scanner.Scan()
@@ -442,16 +442,16 @@ func main() {
 
 		case 41:
 			if currentUser.Role != "employee" {
-				fmt.Println("Forbidden!")
-				return
+				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
+				break
 			}
 			fmt.Println("ALL ORDERS (Employee)")
 			orderController.GetAllOrders(nil)
 
 		case 42:
 			if currentUser.Role != "employee" {
-				fmt.Println("Forbidden!")
-				return
+				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
+				break
 			}
 			fmt.Println("DELIVER ORDER (Employee)")
 
@@ -477,24 +477,24 @@ func main() {
 
 		case 43:
 			if currentUser.Role != "employee" {
-				fmt.Println("Forbidden!")
-				return
+				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
+				break
 			}
 			fmt.Println("VIEW REPORT ORDERS (Employee)")
 			orderController.GetReportOrders()
 
 		case 101:
 			if currentUser.Role != "customer" {
-				fmt.Println("Forbidden!")
-				return
+				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
+				break
 			}
 			fmt.Println("ALL ORDERS (Customer)")
 			orderController.GetAllOrders(currentUser.Id)
 
 		case 102:
 			if currentUser.Role != "customer" {
-				fmt.Println("Forbidden!")
-				return
+				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
+				break
 			}
 			fmt.Println("ADD ORDER (Customer)")
 			drugController.GetAllDrugs()
@@ -524,8 +524,8 @@ func main() {
 
 		case 103:
 			if currentUser.Role != "customer" {
-				fmt.Println("Forbidden!")
-				return
+				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
+				break
 			}
 			fmt.Println("PAY ORDER (Customer)")
 
@@ -561,8 +561,8 @@ func main() {
 
 		case 104:
 			if currentUser.Role != "customer" {
-				fmt.Println("Forbidden!")
-				return
+				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
+				break
 			}
 			fmt.Println("DELETE ORDER (Customer)")
 
