@@ -212,3 +212,44 @@ func TestOrderServicePaidOrder_ValidationError(t *testing.T) {
 
 	mockRepository.AssertExpectations(t)
 }
+
+func TestOrderServiceDeliverOrder_Success(t *testing.T) {
+	order := entity.Order{
+		Id:             "123456",
+		UserId:         "111111",
+		DrugId:         "222222",
+		Quantity:       2,
+		Price:          1000,
+		TotalPrice:     2000,
+		DeliveryStatus: "pending",
+	}
+
+	deliveredOrder := entity.Order{
+		Id:             "123456",
+		UserId:         "111111",
+		DrugId:         "222222",
+		Quantity:       2,
+		Price:          1000,
+		TotalPrice:     2000,
+		DeliveryStatus: "delivered",
+	}
+
+	mockRepository := new(MockOrderRepository)
+
+	mockRepository.On("FindById", "123456").Return(order, nil)
+
+	mockRepository.On("DeliverOrder", order).Return(deliveredOrder, nil)
+
+	orderService := &OrderService{
+		orderRepository: mockRepository,
+	}
+
+	result, err := orderService.UpdateOrderDelivery(deliveredOrder)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, result)
+	assert.Equal(t, deliveredOrder.Id, result.Id, "delivered order should have the same id")
+	assert.Equal(t, deliveredOrder.PaymentStatus, result.PaymentStatus, "order should have delivery status delivered")
+
+	mockRepository.AssertExpectations(t)
+}
