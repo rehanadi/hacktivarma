@@ -1,27 +1,37 @@
 package entity
 
-import "time"
+import (
+	"time"
+)
 
 type Order struct {
 	Id             string
-	OrderNumber    string
 	UserId         string
+	DrugId         string
+	Quantity       int
+	Price          float64
 	TotalPrice     float64
 	PaymentMethod  string
 	PaymentStatus  string
-	DeliveryStatus string
-	DeliveryAt     time.Time
 	PaymentAt      time.Time
+	DeliveryStatus string
+	DeliveredAt    time.Time
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
+	UserName       string
+	UserEmail      string
+	DrugName       string
 }
 
-type OrderDetail struct {
-	Id        string
-	OrderId   string
-	DrugId    string
-	Quantity  int
-	Price     float64
-	CreatedAt time.Time
-	UpdatedAt time.Time
+type ReportOrder struct {
+	Date               string
+	DrugName           string
+	TotalOrderAll      int
+	TotalOrderPending  int
+	TotalOrderSuccess  int
+	TotalOrderFailed   int
+	AmountOrderAll     float64
+	AmountOrderPending float64
+	AmountOrderSuccess float64
+	AmountOrderFailed  float64
 }
