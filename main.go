@@ -40,7 +40,7 @@ func showMenuCustomer(currentUser entity.User, uc *users.UserController) {
 }
 
 func showMenuEmployee(currentUser entity.User, uc *users.UserController) {
-	width := 32
+	width := 40
 	user, err := uc.GetUserById(currentUser.Id)
 	if err != nil {
 		fmt.Println(err)
@@ -54,13 +54,13 @@ func showMenuEmployee(currentUser entity.User, uc *users.UserController) {
 
 	screenLine(width)
 
-	fmt.Printf("31. All Users (Employee)\n")
-	fmt.Printf("32. Add Employee (Employee)\n")
-	fmt.Printf("33. Update User Name By ID (Employee)\n")
-	fmt.Printf("34. Delete User By ID (Employee)\n")
-	fmt.Printf("35. Update User Email By ID (Employee)\n")
-	fmt.Printf("36. Get User Statistics (Employee)\n")
-	fmt.Printf("37. Show Users By Location (Employee)\n")
+	fmt.Printf("31. %-25s %s\n", fmt.Sprintf("All Users"), "[Employee]")
+	fmt.Printf("32. %-25s %s\n", fmt.Sprintf("Add Employee"), "[Employee]")
+	fmt.Printf("33. %-25s %10s\n", fmt.Sprintf("Update User Name By ID"), "[Employee]")
+	fmt.Printf("34. %-25s %10s\n", fmt.Sprintf("Delete User By ID"), "[Employee]")
+	fmt.Printf("35. %-25s %10s\n", fmt.Sprintf("Update User Email By ID"), "[Employee]")
+	fmt.Printf("36. %-25s %10s\n", fmt.Sprintf("Get User Statistics"), "[Employee]")
+	fmt.Printf("37. %-25s %10s\n", fmt.Sprintf("Show Users By Location"), "[Employee]")
 
 	screenLine(width)
 
