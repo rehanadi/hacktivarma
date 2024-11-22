@@ -213,6 +213,10 @@ func (s *UserService) UpdateUserEmailById(userId string, updatedEmail string) er
 
 func (s *UserService) UpdateUserNameById(userId string, updatedName string) error {
 
+	if len(updatedName) > 250 {
+		return errors.New("name is too long")
+	}
+
 	var user entity.User
 
 	query := "SELECT id, name, role, email, password, created_at FROM users WHERE id = $1"
