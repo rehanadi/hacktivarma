@@ -112,13 +112,13 @@ func (oc *OrderController) GetReportOrders() {
 	}
 
 	screenLine(width)
-	fmt.Printf("%-10s | %-15s | %-15s | %-15s | %-15s | %-15s | %-15s | %-15s | %-15s\n",
-		"Date", "Total Order All", "Total Order Pending", "Total Order Success", "Total Order Failed", "Amount Order All", "Amount Order Pending", "Amount Order Success", "Amount Order Failed")
+	fmt.Printf("%-10s | %-15s | %-15s | %-15s | %-15s | %-15s | %-15s | %-15s | %-15s | %-15s\n",
+		"Date", "Drug Name", "Total Order All", "Total Order Pending", "Total Order Success", "Total Order Failed", "Amount Order All", "Amount Order Pending", "Amount Order Success", "Amount Order Failed")
 	screenLine(width)
 
 	for _, reportOrder := range reportOrders {
-		fmt.Printf("%-10s | %-15v | %-15v | %-15v | %-15v | Rp %-12.0f | Rp %-12.0f | Rp %-12.0f | Rp %-12.0f\n",
-			reportOrder.Date, reportOrder.TotalOrderAll, reportOrder.TotalOrderPending, reportOrder.TotalOrderSuccess, reportOrder.TotalOrderFailed, reportOrder.AmountOrderAll*1000, reportOrder.AmountOrderPending*1000, reportOrder.AmountOrderSuccess*1000, reportOrder.AmountOrderFailed*1000)
+		fmt.Printf("%-10s | %-15s | %-15v | %-15v | %-15v | %-15v | Rp %-12.0f | Rp %-12.0f | Rp %-12.0f | Rp %-12.0f\n",
+			reportOrder.Date, reportOrder.DrugName, reportOrder.TotalOrderAll, reportOrder.TotalOrderPending, reportOrder.TotalOrderSuccess, reportOrder.TotalOrderFailed, reportOrder.AmountOrderAll*1000, reportOrder.AmountOrderPending*1000, reportOrder.AmountOrderSuccess*1000, reportOrder.AmountOrderFailed*1000)
 	}
 
 	screenLine(width)
