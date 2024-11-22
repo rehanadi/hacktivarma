@@ -24,6 +24,7 @@ type Order struct {
 
 type ReportOrder struct {
 	Date               string
+	DrugName           string
 	TotalOrderAll      int
 	TotalOrderPending  int
 	TotalOrderSuccess  int
