@@ -26,6 +26,7 @@ func showMenuCustomer(currentUser entity.User, uc *users.UserController) {
 	fmt.Printf("\n\n\t -- Hacktivarma -- \n\n")
 	fmt.Printf("Welcome, %-15s %s'\n\n", user.Name, fmt.Sprintf("Role : '"+user.Role))
 	fmt.Printf("1. All Drugs\n")
+	fmt.Printf("9. Change Name\n")
 
 	screenLine(width)
 
@@ -56,11 +57,11 @@ func showMenuEmployee(currentUser entity.User, uc *users.UserController) {
 
 	fmt.Printf("31. %-25s %s\n", fmt.Sprintf("All Users"), "[Employee]")
 	fmt.Printf("32. %-25s %s\n", fmt.Sprintf("Add Employee"), "[Employee]")
-	fmt.Printf("33. %-25s %10s\n", fmt.Sprintf("Update User Name By ID"), "[Employee]")
-	fmt.Printf("34. %-25s %10s\n", fmt.Sprintf("Delete User By ID"), "[Employee]")
-	fmt.Printf("35. %-25s %10s\n", fmt.Sprintf("Update User Email By ID"), "[Employee]")
-	fmt.Printf("36. %-25s %10s\n", fmt.Sprintf("Get User Statistics"), "[Employee]")
-	fmt.Printf("37. %-25s %10s\n", fmt.Sprintf("Show Users By Location"), "[Employee]")
+	fmt.Printf("33. %-25s %s\n", fmt.Sprintf("Update User Name By ID"), "[Employee]")
+	fmt.Printf("34. %-25s %s\n", fmt.Sprintf("Delete User By ID"), "[Employee]")
+	fmt.Printf("35. %-25s %s\n", fmt.Sprintf("Update User Email By ID"), "[Employee]")
+	fmt.Printf("36. %-25s %s\n", fmt.Sprintf("Get User Statistics"), "[Employee]")
+	fmt.Printf("37. %-25s %s\n", fmt.Sprintf("Show Users By Location"), "[Employee]")
 
 	screenLine(width)
 
@@ -206,6 +207,14 @@ func main() {
 		case 1:
 			drugController.GetAllDrugs()
 		case 2:
+
+		case 9:
+			var inputUserName string
+			fmt.Printf("Enter New Name : ")
+			scanner.Scan()
+			inputUserName = scanner.Text()
+
+			userController.UpdateUserNameById(currentUser.Id, inputUserName)
 
 		case 21:
 			if currentUser.Role != "employee" {
