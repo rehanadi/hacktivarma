@@ -11,5 +11,5 @@ CREATE TABLE users (
 );
 
 INSERT INTO users (name, role, email, password, location) VALUES
-('user1', 'employee', 'user1@mail.com', '$2a$10$3jnVvDAaPq/o6l6JzqBYnu6//c1/fYtDulbGyIF14SgM0gQDiL9iO', 1),
+('user1', 'customer', 'user1@mail.com', '$2a$10$3jnVvDAaPq/o6l6JzqBYnu6//c1/fYtDulbGyIF14SgM0gQDiL9iO', 1),
 ('user2', 'employee', 'user2@mail.com', '$2a$10$jYfN0ZJ5u3nWq5mcyGgKZu.NbwhnmIW/.gxBsjc4Nz0Dl6Jmlkflu', 1);
