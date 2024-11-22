@@ -17,15 +17,12 @@ create table orders (
   CONSTRAINT fk_order_drug FOREIGN KEY(drug_id) REFERENCES drugs(id)
 );
 
-INSERT INTO orders(user_id, drug_id, quantity, price, total_price, payment_method, payment_status, delivery_status)
+INSERT INTO orders(user_id, drug_id, quantity, price, total_price)
 VALUES
 (
   (SELECT id FROM users WHERE email = 'user1@mail.com'),
   (SELECT id FROM drugs WHERE name = 'Paracetamol'),
   2,
   (SELECT price FROM drugs WHERE name = 'Paracetamol'),
-  (SELECT price * 2 FROM drugs WHERE name = 'Paracetamol'),
-  'Gopay',
-  'unpaid',
-  'pending'
+  (SELECT price * 2 FROM drugs WHERE name = 'Paracetamol')
 );
