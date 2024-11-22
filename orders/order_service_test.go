@@ -1,0 +1,69 @@
+package orders
+
+import (
+	entity "hacktivarma/entities"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+)
+
+type MockOrderRepository struct {
+	mock.Mock
+}
+
+func (m *MockOrderRepository) FindById(orderId string) (entity.Order, error) {
+	args := m.Called(orderId)
+	return args.Get(0).(entity.Order), args.Error(1)
+}
+
+func (m *MockOrderRepository) DeleteById(orderId string) error {
+	args := m.Called(orderId)
+	return args.Error(0)
+}
+
+func (m *MockOrderRepository) CreateOrder(order entity.Order) (entity.Order, error) {
+	args := m.Called(order)
+	return args.Get(0).(entity.Order), args.Error(1)
+}
+
+func (m *MockOrderRepository) PayOrder(order entity.Order) (entity.Order, error) {
+	args := m.Called(order)
+	return args.Get(0).(entity.Order), args.Error(1)
+}
+
+func (m *MockOrderRepository) DeliverOrder(order entity.Order) (entity.Order, error) {
+	args := m.Called(order)
+	return args.Get(0).(entity.Order), args.Error(1)
+}
+
+func TestOrderServiceGetOneOrder_Success(t *testing.T) {
+	order := entity.Order{
+		Id:             "123456",
+		UserId:         "111111",
+		DrugId:         "222222",
+		Quantity:       2,
+		Price:          1000,
+		TotalPrice:     2000,
+		PaymentMethod:  "gopay",
+		PaymentStatus:  "paid",
+		DeliveryStatus: "delivered",
+	}
+
+	mockRepo := new(MockOrderRepository)
+	mockRepo.On("FindById", "123456").Return(order, nil)
+
+	orderService := &OrderService{
+		orderRepository: mockRepo,
+	}
+
+	result, err := orderService.GetOneOrder("123456")
+
+	assert.Nil(t, err)
+	assert.NotNil(t, result)
+	assert.Equal(t, order.Id, result.Id, "result has to be '123456'")
+	assert.Equal(t, order.TotalPrice, result.TotalPrice, "result has to be '2000'")
+	assert.Equal(t, &order, result, "result has to be order with user id '111111'")
+
+	mockRepo.AssertExpectations(t)
+}
