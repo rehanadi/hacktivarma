@@ -9,8 +9,16 @@ import (
 	entity "hacktivarma/entities"
 )
 
+type DrugRepository interface {
+	FindDrug(drugID string) (entity.Drug, error)
+	AddDrug(drug entity.Drug) (entity.Drug, error)
+	UpdateDrug(drug entity.Drug) (entity.Drug, error)
+	DeleteDrug(drugID string) error
+}
+
 type DrugService struct {
-	DB *sql.DB
+	DB             *sql.DB
+	drugRepository DrugRepository
 }
 
 func NewDrugService(db *sql.DB) *DrugService {
@@ -208,6 +216,66 @@ func (s *DrugService) checkAvailabilityDrug(drugID string) error {
 			return fmt.Errorf("Drug with ID %s not found", drugID)
 		}
 
+		return err
+	}
+
+	return nil
+}
+
+func (s *DrugService) FindDrugByIDTest(drugID string) (*entity.Drug, error) {
+	drug, err := s.drugRepository.FindDrug(drugID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &drug, nil
+}
+
+func (s *DrugService) AddDrugTest(drug entity.Drug) (*entity.Drug, error) {
+	if drug.Name == "" {
+		return nil, fmt.Errorf("name cannot be empty")
+	}
+
+	drug, err := s.drugRepository.AddDrug(drug)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &drug, nil
+}
+
+func (s *DrugService) UpdateDrugTest(drug entity.Drug) (*entity.Drug, error) {
+	if drug.Stock <= 0 {
+		return nil, fmt.Errorf("stock must be greater than 0")
+	}
+
+	drug, err := s.drugRepository.FindDrug(drug.Id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	drug, err = s.drugRepository.UpdateDrug(drug)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &drug, nil
+}
+
+func (s *DrugService) DeleteDrugByIDTest(drugID string) error {
+	_, err := s.drugRepository.FindDrug(drugID)
+
+	if err != nil {
+		return err
+	}
+
+	err = s.drugRepository.DeleteDrug(drugID)
+
+	if err != nil {
 		return err
 	}
 
