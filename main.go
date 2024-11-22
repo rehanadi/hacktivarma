@@ -391,9 +391,15 @@ func main() {
 			scanner.Scan()
 			inputUserId = scanner.Text()
 
+			if inputUserId == currentUser.Id {
+				clearScreen()
+				fmt.Println("\n    ** You can't delete yourself **")
+				break
+			}
+			clearScreen()
 			userController.DeleteUserById(inputUserId)
-
 			userController.GetAllUsers()
+
 		case 35:
 			if currentUser.Role != "employee" {
 				fmt.Println("Forbidden!")

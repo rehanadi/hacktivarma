@@ -69,6 +69,7 @@ func (uc *UserController) DeleteUserById(userId string) {
 		fmt.Println("Error delete user :", err)
 		return
 	}
+	fmt.Printf("User with ID : %s successfully deleted!\n", userId)
 }
 
 func (uc *UserController) UpdateUserEmailById(userId, updatedEmail string) {
