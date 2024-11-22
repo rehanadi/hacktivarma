@@ -279,3 +279,30 @@ func TestOrderServiceDeliverOrder_ValidationError(t *testing.T) {
 
 	mockRepository.AssertExpectations(t)
 }
+
+func TestOrderServiceDeleteOrder_Success(t *testing.T) {
+	order := entity.Order{
+		Id:         "123456",
+		UserId:     "111111",
+		DrugId:     "222222",
+		Quantity:   2,
+		Price:      1000,
+		TotalPrice: 2000,
+	}
+
+	mockRepository := new(MockOrderRepository)
+
+	mockRepository.On("FindById", "123456").Return(order, nil)
+
+	mockRepository.On("DeleteById", "123456").Return(nil)
+
+	orderService := &OrderService{
+		orderRepository: mockRepository,
+	}
+
+	err := orderService.DeleteById("123456")
+
+	assert.Nil(t, err)
+
+	mockRepository.AssertExpectations(t)
+}
