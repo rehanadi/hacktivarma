@@ -253,3 +253,29 @@ func TestOrderServiceDeliverOrder_Success(t *testing.T) {
 
 	mockRepository.AssertExpectations(t)
 }
+
+func TestOrderServiceDeliverOrder_ValidationError(t *testing.T) {
+	order := entity.Order{
+		Id:             "",
+		UserId:         "111111",
+		DrugId:         "222222",
+		Quantity:       2,
+		Price:          1000,
+		TotalPrice:     2000,
+		DeliveryStatus: "pending",
+	}
+
+	mockRepository := new(MockOrderRepository)
+
+	orderService := &OrderService{
+		orderRepository: mockRepository,
+	}
+
+	result, err := orderService.UpdateOrderDelivery(order)
+
+	assert.NotNil(t, err)
+	assert.Equal(t, "order id cannot be empty", err.Error())
+	assert.Nil(t, result)
+
+	mockRepository.AssertExpectations(t)
+}
