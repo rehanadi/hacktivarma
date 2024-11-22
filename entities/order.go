@@ -19,6 +19,7 @@ type Order struct {
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 	UserName       string
+	UserEmail      string
 	DrugName       string
 }
 
