@@ -125,3 +125,23 @@ func (dc *DrugController) DeleteDrugById(drugId string) {
 
 	fmt.Printf("Successfully delete drug with id: %s", drugId)
 }
+
+func (dc *DrugController) GetReportDrugs() {
+	width := 34
+	drugs, err := dc.DrugService.GetReportDrugs()
+
+	if err != nil {
+		fmt.Println("Error :", err)
+		return
+	}
+
+	screenLine(width)
+	fmt.Printf("%-8s | %-14s | %-14v\n", "No", "Drug Name", "TotalOrder")
+	screenLine(width)
+
+	for i, row := range drugs {
+		fmt.Printf("%-8v | %-14s | %-14v\n", i+1, row.Name, row.TotalOrder)
+	}
+
+	screenLine(width)
+}

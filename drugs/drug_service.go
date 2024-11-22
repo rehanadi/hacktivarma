@@ -204,6 +204,41 @@ func (s *DrugService) DeleteDrugById(drugID string) error {
 	return nil
 }
 
+func (s *DrugService) GetReportDrugs() ([]entity.ReportDrug, error) {
+	var drugs []entity.ReportDrug
+
+	query := `
+		SELECT drugs.name, COUNT(orders.id) AS TotalOrder
+		FROM drugs
+		JOIN orders ON drugs.id = orders.drug_id
+		GROUP BY drugs.name
+		ORDER BY TotalOrder DESC
+	`
+
+	rows, err := s.DB.Query(query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var drug entity.ReportDrug
+
+		err := rows.Scan(
+			&drug.Name,
+			&drug.TotalOrder,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		drugs = append(drugs, drug)
+	}
+
+	return drugs, nil
+}
+
 func (s *DrugService) checkAvailabilityDrug(drugID string) error {
 	var drug entity.Drug
 

@@ -55,6 +55,7 @@ func showMenuEmployee(currentUser entity.User, uc *users.UserController) {
 	fmt.Printf("24. %-25s %s\n", fmt.Sprintf("Show Drugs Expiring Soon"), "[Employee]")
 	fmt.Printf("25. %-25s %s\n", fmt.Sprintf("Update Drug Stock"), "[Employee]")
 	fmt.Printf("26. %-25s %s\n", fmt.Sprintf("Delete Drug By ID"), "[Employee]")
+	fmt.Printf("27. %-25s %s\n", fmt.Sprintf("View Report Drugs"), "[Employee]")
 
 	screenLine(width)
 
@@ -331,6 +332,8 @@ func main() {
 			inputDrugId = scanner.Text()
 
 			drugController.DeleteDrugById(inputDrugId)
+		case 27:
+			drugController.GetReportDrugs()
 		case 31:
 			if currentUser.Role != "employee" {
 				fmt.Printf("\n\n\t  ** Forbidden **\n\n")

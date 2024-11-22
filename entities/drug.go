@@ -15,3 +15,8 @@ type Drug struct {
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }
+
+type ReportDrug struct {
+	Name       string
+	TotalOrder int
+}
