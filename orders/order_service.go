@@ -9,8 +9,17 @@ import (
 	entity "hacktivarma/entities"
 )
 
+type OrderRepository interface {
+	FindById(orderId string) (entity.Order, error)
+	DeleteById(orderId string) error
+	CreateOrder(order entity.Order) (entity.Order, error)
+	PayOrder(order entity.Order) (entity.Order, error)
+	DeliverOrder(order entity.Order) (entity.Order, error)
+}
+
 type OrderService struct {
-	DB *sql.DB
+	DB              *sql.DB
+	orderRepository OrderRepository
 }
 
 func NewOrderService(db *sql.DB) *OrderService {
@@ -493,4 +502,71 @@ func (s *OrderService) DeleteOrderById(orderId string, userId string) error {
 	}
 
 	return nil
+}
+
+func (s *OrderService) GetOneOrder(orderId string) (*entity.Order, error) {
+
+	order, err := s.orderRepository.FindById(orderId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &order, nil
+}
+
+func (s *OrderService) DeleteById(orderId string) error {
+
+	_, err := s.orderRepository.FindById(orderId)
+	if err != nil {
+		return err
+	}
+
+	return s.orderRepository.DeleteById(orderId)
+}
+
+func (s *OrderService) CreateOrder(order entity.Order) (*entity.Order, error) {
+
+	if order.Quantity <= 0 {
+		return nil, fmt.Errorf("quantity must be greater than 0")
+	}
+
+	order, err := s.orderRepository.CreateOrder(order)
+	if err != nil {
+		return nil, err
+	}
+	return &order, nil
+}
+
+func (s *OrderService) UpdateOrderPayment(order entity.Order) (*entity.Order, error) {
+	if order.PaymentMethod == "" {
+		return nil, fmt.Errorf("payment method cannot be empty")
+	}
+
+	order, err := s.orderRepository.FindById(order.Id)
+	if err != nil {
+		return nil, err
+	}
+	updatedOrder, err := s.orderRepository.PayOrder(order)
+	if err != nil {
+		return nil, err
+	}
+
+	return &updatedOrder, nil
+}
+
+func (s *OrderService) UpdateOrderDelivery(order entity.Order) (*entity.Order, error) {
+	if order.Id == "" {
+		return nil, fmt.Errorf("order id cannot be empty")
+	}
+
+	order, err := s.orderRepository.FindById(order.Id)
+	if err != nil {
+		return nil, err
+	}
+	updatedOrder, err := s.orderRepository.DeliverOrder(order)
+	if err != nil {
+		return nil, err
+	}
+
+	return &updatedOrder, nil
 }
