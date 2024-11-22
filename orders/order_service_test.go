@@ -306,3 +306,20 @@ func TestOrderServiceDeleteOrder_Success(t *testing.T) {
 
 	mockRepository.AssertExpectations(t)
 }
+func TestOrderServiceDeleteOrder_OrderNotFound(t *testing.T) {
+	emptyOrder := entity.Order{}
+	mockRepository := new(MockOrderRepository)
+
+	mockRepository.On("FindById", "123456").Return(emptyOrder, fmt.Errorf("order not found"))
+
+	orderService := &OrderService{
+		orderRepository: mockRepository,
+	}
+
+	err := orderService.DeleteById("123456")
+
+	assert.NotNil(t, err)
+	assert.Equal(t, "order not found", err.Error())
+
+	mockRepository.AssertExpectations(t)
+}
