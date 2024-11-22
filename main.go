@@ -45,8 +45,9 @@ func showMenuEmployee(currentUser entity.User, uc *users.UserController) {
 	fmt.Printf("21. All Drugs (Employee)\n")
 	fmt.Printf("22. Find Drug By ID (Employee)\n")
 	fmt.Printf("23. Add Drug (Employee)\n")
-	fmt.Printf("24. Update Drug Stock (Employee)\n")
-	fmt.Printf("25. Delete Drug By ID (Employee)\n")
+	fmt.Printf("24. Show Drugs Expiring Soon (Employee)\n")
+	fmt.Printf("25. Update Drug Stock (Employee)\n")
+	fmt.Printf("26. Delete Drug By ID (Employee)\n")
 
 	screenLine(width)
 
@@ -236,6 +237,8 @@ func main() {
 			drugController.GetAllDrugs()
 
 		case 24:
+			drugController.ShowExpiringDrugs()
+		case 25:
 			if currentUser.Role != "employee" {
 				fmt.Println("Forbidden!")
 				return
@@ -256,7 +259,7 @@ func main() {
 
 			drugController.UpdateDrugStock(inputDrugId, inputDrugStock)
 
-		case 25:
+		case 26:
 			if currentUser.Role != "employee" {
 				fmt.Println("Forbidden!")
 				return

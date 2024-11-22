@@ -111,6 +111,53 @@ func (s *DrugService) AddDrug(drug entity.Drug) error {
 	return nil
 }
 
+func (s *DrugService) GetDrugsExpiringSoon() ([]entity.Drug, error) {
+	var drugs []entity.Drug
+
+	query := `
+		SELECT drugs.id, drugs.name, categories.name, drugs.stock, drugs.price, drugs.expired_date
+		FROM drugs
+		JOIN categories ON drugs.category = categories.id 
+	`
+
+	rows, err := s.DB.Query(query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Current date for comparison
+	currentDate := time.Now()
+
+	// Define a threshold for expiry (e.g., 30 days)
+	expiryThreshold := 30 * 24 * time.Hour
+
+	// Loop through the rows and check for expiring drugs
+	for rows.Next() {
+		var drug entity.Drug
+
+		err := rows.Scan(
+			&drug.Id,
+			&drug.Name,
+			&drug.CategoryName,
+			&drug.Stock,
+			&drug.Price,
+			&drug.ExpiredDate,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		// Check if the drug is expiring within the threshold
+		if drug.ExpiredDate.Sub(currentDate) <= expiryThreshold {
+			drugs = append(drugs, drug)
+		}
+	}
+
+	return drugs, nil
+}
+
 func (s *DrugService) UpdateDrugStock(drugId string, updatedStock int) error {
 	var drug entity.Drug
 

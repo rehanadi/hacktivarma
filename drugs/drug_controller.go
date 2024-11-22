@@ -74,6 +74,36 @@ func (dc *DrugController) AddDrug(drug entity.Drug) error {
 	return nil
 }
 
+func (dc *DrugController) ShowExpiringDrugs() {
+	width := 100
+	drugs, err := dc.DrugService.GetDrugsExpiringSoon()
+
+	if err != nil {
+		fmt.Println("Error retrieving drugs:", err)
+		return
+	}
+
+	if len(drugs) == 0 {
+		fmt.Println("No drugs are expiring soon.")
+		return
+	}
+
+	// Display the expiring drugs in a table format
+	fmt.Println("Drugs Expiring Soon:")
+	screenLine(width)
+	fmt.Printf("%-8s | %-14s | %-14s | %-5v | %-11s | %-14s | %-10s\n", "ID", "Drug Name", "Category", "Stock", "Price", "Expired", "Warning")
+	screenLine(width)
+
+	for _, drug := range drugs {
+		if len(drug.CategoryName) > 10 {
+			drug.CategoryName = drug.CategoryName[:10] + "..." // Truncate to 10 characters
+		}
+
+		fmt.Printf("%-8s | %-14s | %-14s | %-5v | Rp %-8.0f | %-14s | Expiring soon!\n",
+			drug.Id, drug.Name, drug.CategoryName, drug.Stock, drug.Price*1000, drug.ExpiredDate.Format("2006-01-02"))
+	}
+}
+
 func (dc *DrugController) UpdateDrugStock(drugId string, updatedStock int) {
 	err := dc.DrugService.UpdateDrugStock(drugId, updatedStock)
 
