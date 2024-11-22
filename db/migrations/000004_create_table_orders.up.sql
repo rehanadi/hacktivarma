@@ -25,4 +25,137 @@ VALUES
   2,
   (SELECT price FROM drugs WHERE name = 'Paracetamol'),
   (SELECT price * 2 FROM drugs WHERE name = 'Paracetamol')
+), 
+(
+  (SELECT id FROM users WHERE email = 'user1@mail.com'),
+  (SELECT id FROM drugs WHERE name = 'Paracetamol'),
+  2,
+  (SELECT price FROM drugs WHERE name = 'Paracetamol'),
+  (SELECT price * 2 FROM drugs WHERE name = 'Paracetamol')
+), 
+(
+  (SELECT id FROM users WHERE email = 'user1@mail.com'),
+  (SELECT id FROM drugs WHERE name = 'Amoxicillin'),
+  3,
+  (SELECT price FROM drugs WHERE name = 'Amoxicillin'),
+  (SELECT price * 3 FROM drugs WHERE name = 'Amoxicillin')
+), 
+(
+  (SELECT id FROM users WHERE email = 'user1@mail.com'),
+  (SELECT id FROM drugs WHERE name = 'Amoxicillin'),
+  3,
+  (SELECT price FROM drugs WHERE name = 'Amoxicillin'),
+  (SELECT price * 3 FROM drugs WHERE name = 'Amoxicillin')
+), 
+(
+  (SELECT id FROM users WHERE email = 'user1@mail.com'),
+  (SELECT id FROM drugs WHERE name = 'Amoxicillin'),
+  3,
+  (SELECT price FROM drugs WHERE name = 'Amoxicillin'),
+  (SELECT price * 3 FROM drugs WHERE name = 'Amoxicillin')
+), 
+(
+  (SELECT id FROM users WHERE email = 'user1@mail.com'),
+  (SELECT id FROM drugs WHERE name = 'Ibuprofen'),
+  4,
+  (SELECT price FROM drugs WHERE name = 'Ibuprofen'),
+  (SELECT price * 4 FROM drugs WHERE name = 'Ibuprofen')
+), 
+(
+  (SELECT id FROM users WHERE email = 'user1@mail.com'),
+  (SELECT id FROM drugs WHERE name = 'Ibuprofen'),
+  4,
+  (SELECT price FROM drugs WHERE name = 'Ibuprofen'),
+  (SELECT price * 4 FROM drugs WHERE name = 'Ibuprofen')
+), 
+(
+  (SELECT id FROM users WHERE email = 'user1@mail.com'),
+  (SELECT id FROM drugs WHERE name = 'Ibuprofen'),
+  4,
+  (SELECT price FROM drugs WHERE name = 'Ibuprofen'),
+  (SELECT price * 4 FROM drugs WHERE name = 'Ibuprofen')
+), 
+(
+  (SELECT id FROM users WHERE email = 'user1@mail.com'),
+  (SELECT id FROM drugs WHERE name = 'Ibuprofen'),
+  4,
+  (SELECT price FROM drugs WHERE name = 'Ibuprofen'),
+  (SELECT price * 4 FROM drugs WHERE name = 'Ibuprofen')
+), 
+(
+  (SELECT id FROM users WHERE email = 'user1@mail.com'),
+  (SELECT id FROM drugs WHERE name = 'Morfin'),
+  5,
+  (SELECT price FROM drugs WHERE name = 'Morfin'),
+  (SELECT price * 5 FROM drugs WHERE name = 'Morfin')
+), 
+(
+  (SELECT id FROM users WHERE email = 'user1@mail.com'),
+  (SELECT id FROM drugs WHERE name = 'Morfin'),
+  5,
+  (SELECT price FROM drugs WHERE name = 'Morfin'),
+  (SELECT price * 5 FROM drugs WHERE name = 'Morfin')
+), 
+(
+  (SELECT id FROM users WHERE email = 'user1@mail.com'),
+  (SELECT id FROM drugs WHERE name = 'Morfin'),
+  5,
+  (SELECT price FROM drugs WHERE name = 'Morfin'),
+  (SELECT price * 5 FROM drugs WHERE name = 'Morfin')
+), 
+(
+  (SELECT id FROM users WHERE email = 'user1@mail.com'),
+  (SELECT id FROM drugs WHERE name = 'Morfin'),
+  5,
+  (SELECT price FROM drugs WHERE name = 'Morfin'),
+  (SELECT price * 5 FROM drugs WHERE name = 'Morfin')
+), 
+(
+  (SELECT id FROM users WHERE email = 'user1@mail.com'),
+  (SELECT id FROM drugs WHERE name = 'Morfin'),
+  5,
+  (SELECT price FROM drugs WHERE name = 'Morfin'),
+  (SELECT price * 5 FROM drugs WHERE name = 'Morfin')
+), 
+(
+  (SELECT id FROM users WHERE email = 'user1@mail.com'),
+  (SELECT id FROM drugs WHERE name = 'Jahe'),
+  6,
+  (SELECT price FROM drugs WHERE name = 'Jahe'),
+  (SELECT price * 6 FROM drugs WHERE name = 'Jahe')
+), 
+(
+  (SELECT id FROM users WHERE email = 'user1@mail.com'),
+  (SELECT id FROM drugs WHERE name = 'Jahe'),
+  6,
+  (SELECT price FROM drugs WHERE name = 'Jahe'),
+  (SELECT price * 6 FROM drugs WHERE name = 'Jahe')
+), 
+(
+  (SELECT id FROM users WHERE email = 'user1@mail.com'),
+  (SELECT id FROM drugs WHERE name = 'Jahe'),
+  6,
+  (SELECT price FROM drugs WHERE name = 'Jahe'),
+  (SELECT price * 6 FROM drugs WHERE name = 'Jahe')
+), 
+(
+  (SELECT id FROM users WHERE email = 'user1@mail.com'),
+  (SELECT id FROM drugs WHERE name = 'Jahe'),
+  6,
+  (SELECT price FROM drugs WHERE name = 'Jahe'),
+  (SELECT price * 6 FROM drugs WHERE name = 'Jahe')
+), 
+(
+  (SELECT id FROM users WHERE email = 'user1@mail.com'),
+  (SELECT id FROM drugs WHERE name = 'Jahe'),
+  6,
+  (SELECT price FROM drugs WHERE name = 'Jahe'),
+  (SELECT price * 6 FROM drugs WHERE name = 'Jahe')
+), 
+(
+  (SELECT id FROM users WHERE email = 'user1@mail.com'),
+  (SELECT id FROM drugs WHERE name = 'Jahe'),
+  6,
+  (SELECT price FROM drugs WHERE name = 'Jahe'),
+  (SELECT price * 6 FROM drugs WHERE name = 'Jahe')
 );
