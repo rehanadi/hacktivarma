@@ -30,10 +30,10 @@ func showMenuCustomer(currentUser entity.User, uc *users.UserController) {
 
 	screenLine(width)
 
-	fmt.Printf("101. All Orders (Customer)\n")
-	fmt.Printf("102. Add Order (Customer)\n")
-	fmt.Printf("103. Pay Order (Customer)\n")
-	fmt.Printf("104. Delete Order (Customer)\n")
+	fmt.Printf("101. All Orders\n")
+	fmt.Printf("102. Add Order\n")
+	fmt.Printf("103. Pay Order\n")
+	fmt.Printf("104. Delete Order\n")
 
 	screenLine(width)
 
@@ -48,10 +48,10 @@ func showMenuEmployee(currentUser entity.User, uc *users.UserController) {
 	}
 	fmt.Printf("\n\n\t -- Hacktivarma -- \n\n")
 	fmt.Printf("Hello, %-15s %s'\n\n", user.Name, fmt.Sprintf("Role : '"+user.Role))
-	fmt.Printf("21. All Drugs (Employee)\n")
-	fmt.Printf("22. Add Drug (Employee)\n")
-	fmt.Printf("23. Update Drug Stock (Employee)\n")
-	fmt.Printf("24. Delete Drug By ID (Employee)\n")
+	fmt.Printf("21. %-25s %s\n", fmt.Sprintf("All Drugs"), "[Employee]")
+	fmt.Printf("22. %-25s %s\n", fmt.Sprintf("Add Drug"), "[Employee]")
+	fmt.Printf("23. %-25s %s\n", fmt.Sprintf("Update Drug Stock"), "[Employee]")
+	fmt.Printf("24. %-25s %s\n", fmt.Sprintf("Delete Drug By ID"), "[Employee]")
 
 	screenLine(width)
 
@@ -65,9 +65,9 @@ func showMenuEmployee(currentUser entity.User, uc *users.UserController) {
 
 	screenLine(width)
 
-	fmt.Printf("41. All Orders (Employee)\n")
-	fmt.Printf("42. Deliver Order (Employee)\n")
-	fmt.Printf("43. View Report Orders (Employee)\n")
+	fmt.Printf("41. %-25s %s\n", fmt.Sprintf("All Orders"), "[Employee]")
+	fmt.Printf("42. %-25s %s\n", fmt.Sprintf("Deliver Order"), "[Employee]")
+	fmt.Printf("43. %-25s %s\n", fmt.Sprintf("View Report Orders"), "[Employee]")
 
 	screenLine(width)
 
@@ -221,15 +221,12 @@ func main() {
 				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
 				break
 			}
-			fmt.Println("ALL DRUGS (Employee)")
 			drugController.GetAllDrugs()
 		case 22:
 			if currentUser.Role != "employee" {
 				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
 				break
 			}
-			fmt.Println("ADD DRUG (Employee)")
-
 			var inputDrugStock, inputDrugCategory int
 			var inputDrugDose, inputDrugPrice float64
 			var inputDrugName, inputDrugForm, inputDrugExpiredDate string
@@ -286,8 +283,6 @@ func main() {
 				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
 				break
 			}
-			fmt.Println("Update DRUG Stock (Employee)")
-
 			drugController.GetAllDrugs()
 
 			var inputDrugId string
@@ -307,8 +302,6 @@ func main() {
 				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
 				break
 			}
-			fmt.Println("Delete DRUG By ID (Employee)")
-
 			drugController.GetAllDrugs()
 
 			var inputDrugId string
@@ -331,7 +324,6 @@ func main() {
 				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
 				break
 			}
-			fmt.Println("ADD EMPLOYEE (Employee)")
 			fmt.Printf("\nEnter name : ")
 			scanner.Scan()
 			inputName = scanner.Text()
@@ -360,8 +352,6 @@ func main() {
 				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
 				break
 			}
-			fmt.Println("Update User Name By ID (Employee)")
-
 			userController.GetAllUsers()
 
 			var inputUserId string
@@ -383,7 +373,6 @@ func main() {
 				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
 				break
 			}
-			fmt.Println("Delete User By ID (Employee)")
 			userController.GetAllUsers()
 			var inputUserId string
 
@@ -405,8 +394,6 @@ func main() {
 				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
 				break
 			}
-			fmt.Println("Update User Email By ID (Employee)")
-
 			userController.GetAllUsers()
 
 			var inputUserId string
@@ -445,7 +432,6 @@ func main() {
 				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
 				break
 			}
-			fmt.Println("ALL ORDERS (Employee)")
 			orderController.GetAllOrders(nil)
 
 		case 42:
@@ -453,8 +439,6 @@ func main() {
 				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
 				break
 			}
-			fmt.Println("DELIVER ORDER (Employee)")
-
 			orders, err := orderController.GetUndeliveredOrders()
 
 			if err != nil {
@@ -480,7 +464,6 @@ func main() {
 				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
 				break
 			}
-			fmt.Println("VIEW REPORT ORDERS (Employee)")
 			orderController.GetReportOrders()
 
 		case 101:
@@ -488,7 +471,6 @@ func main() {
 				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
 				break
 			}
-			fmt.Println("ALL ORDERS (Customer)")
 			orderController.GetAllOrders(currentUser.Id)
 
 		case 102:
@@ -496,7 +478,6 @@ func main() {
 				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
 				break
 			}
-			fmt.Println("ADD ORDER (Customer)")
 			drugController.GetAllDrugs()
 
 			var inputDrugID string
@@ -527,8 +508,6 @@ func main() {
 				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
 				break
 			}
-			fmt.Println("PAY ORDER (Customer)")
-
 			orders, err := orderController.GetUnpaidOrders(currentUser.Id)
 
 			if err != nil {
@@ -564,8 +543,6 @@ func main() {
 				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
 				break
 			}
-			fmt.Println("DELETE ORDER (Customer)")
-
 			orders, err := orderController.GetFailedOrders(currentUser.Id)
 
 			if err != nil {
