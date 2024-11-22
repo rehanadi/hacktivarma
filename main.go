@@ -48,10 +48,14 @@ func showMenuEmployee(currentUser entity.User, uc *users.UserController) {
 	}
 	fmt.Printf("\n\n\t -- Hacktivarma -- \n\n")
 	fmt.Printf("Hello, %-15s %s'\n\n", user.Name, fmt.Sprintf("Role : '"+user.Role))
+
 	fmt.Printf("21. %-25s %s\n", fmt.Sprintf("All Drugs"), "[Employee]")
-	fmt.Printf("22. %-25s %s\n", fmt.Sprintf("Add Drug"), "[Employee]")
-	fmt.Printf("23. %-25s %s\n", fmt.Sprintf("Update Drug Stock"), "[Employee]")
-	fmt.Printf("24. %-25s %s\n", fmt.Sprintf("Delete Drug By ID"), "[Employee]")
+	fmt.Printf("22. %-25s %s\n", fmt.Sprintf("Find Drug By ID"), "[Employee]")
+	fmt.Printf("23. %-25s %s\n", fmt.Sprintf("Add Drug"), "[Employee]")
+	fmt.Printf("24. %-25s %s\n", fmt.Sprintf("Show Drugs Expiring Soon"), "[Employee]")
+	fmt.Printf("25. %-25s %s\n", fmt.Sprintf("Update Drug Stock"), "[Employee]")
+	fmt.Printf("26. %-25s %s\n", fmt.Sprintf("Delete Drug By ID"), "[Employee]")
+	fmt.Printf("27. %-25s %s\n", fmt.Sprintf("View Report Drugs"), "[Employee]")
 
 	screenLine(width)
 
@@ -227,6 +231,22 @@ func main() {
 				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
 				break
 			}
+
+			var drugID string
+
+			fmt.Println("Find Drug By ID")
+			fmt.Print("Enter Drug ID: ")
+			fmt.Scan(&drugID)
+
+			drugController.FindDrugByID(drugID)
+		case 23:
+			if currentUser.Role != "employee" {
+				fmt.Println("Forbidden!")
+				return
+			}
+
+			fmt.Println("ADD DRUG (Employee)")
+
 			var inputDrugStock, inputDrugCategory int
 			var inputDrugDose, inputDrugPrice float64
 			var inputDrugName, inputDrugForm, inputDrugExpiredDate string
@@ -271,18 +291,17 @@ func main() {
 				Category:    inputDrugCategory,
 			}
 
-			err = drugController.AddDrug(drug)
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-			drugController.GetAllDrugs()
-
-		case 23:
+			drugController.AddDrug(drug)
+		case 24:
+			drugController.ShowExpiringDrugs()
+		case 25:
 			if currentUser.Role != "employee" {
 				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
 				break
 			}
+
+			fmt.Println("Update DRUG Stock (Employee)")
+
 			drugController.GetAllDrugs()
 
 			var inputDrugId string
@@ -296,12 +315,14 @@ func main() {
 			fmt.Scanln(&inputDrugStock)
 
 			drugController.UpdateDrugStock(inputDrugId, inputDrugStock)
-
-		case 24:
+		case 26:
 			if currentUser.Role != "employee" {
 				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
 				break
 			}
+
+			fmt.Println("Delete DRUG By ID (Employee)")
+
 			drugController.GetAllDrugs()
 
 			var inputDrugId string
@@ -311,8 +332,8 @@ func main() {
 			inputDrugId = scanner.Text()
 
 			drugController.DeleteDrugById(inputDrugId)
-			drugController.GetAllDrugs()
-
+		case 27:
+			drugController.GetReportDrugs()
 		case 31:
 			if currentUser.Role != "employee" {
 				fmt.Printf("\n\n\t  ** Forbidden **\n\n")
