@@ -23,7 +23,7 @@ func (s *OrderService) GetAllOrders(userId interface{}) ([]entity.Order, error) 
 	query := `
 		SELECT a.id, a.user_id, a.drug_id, a.quantity, a.price, a.total_price,
 					a.payment_method, a.payment_status, a.payment_at, a.delivery_status, a.delivered_at,
-					a.created_at, a.updated_at, b.name user_name, c.name drug_name
+					a.created_at, a.updated_at, b.name user_name, b.email user_email, c.name drug_name
 		FROM orders a, users b, drugs c
 		WHERE a.user_id = b.id
 		AND a.drug_id = c.id
@@ -60,6 +60,7 @@ func (s *OrderService) GetAllOrders(userId interface{}) ([]entity.Order, error) 
 			&order.CreatedAt,
 			&order.UpdatedAt,
 			&order.UserName,
+			&order.UserEmail,
 			&order.DrugName,
 		)
 		if err != nil {
@@ -88,7 +89,7 @@ func (s *OrderService) GetUnpaidOrders(userId string) ([]entity.Order, error) {
 	query := `
 		SELECT a.id, a.user_id, a.drug_id, a.quantity, a.price, a.total_price,
 					a.payment_method, a.payment_status, a.payment_at, a.delivery_status, a.delivered_at,
-					a.created_at, a.updated_at, b.name user_name, c.name drug_name
+					a.created_at, a.updated_at, b.name user_name, b.email user_email, c.name drug_name
 		FROM orders a, users b, drugs c
 		WHERE a.user_id = b.id
 		AND a.drug_id = c.id
@@ -122,6 +123,7 @@ func (s *OrderService) GetUnpaidOrders(userId string) ([]entity.Order, error) {
 			&order.CreatedAt,
 			&order.UpdatedAt,
 			&order.UserName,
+			&order.UserEmail,
 			&order.DrugName,
 		)
 		if err != nil {
@@ -150,7 +152,7 @@ func (s *OrderService) GetFailedOrders(userId string) ([]entity.Order, error) {
 	query := `
 		SELECT a.id, a.user_id, a.drug_id, a.quantity, a.price, a.total_price,
 					a.payment_method, a.payment_status, a.payment_at, a.delivery_status, a.delivered_at,
-					a.created_at, a.updated_at, b.name user_name, c.name drug_name
+					a.created_at, a.updated_at, b.name user_name, b.email user_email, c.name drug_name
 		FROM orders a, users b, drugs c
 		WHERE a.user_id = b.id
 		AND a.drug_id = c.id
@@ -184,6 +186,7 @@ func (s *OrderService) GetFailedOrders(userId string) ([]entity.Order, error) {
 			&order.CreatedAt,
 			&order.UpdatedAt,
 			&order.UserName,
+			&order.UserEmail,
 			&order.DrugName,
 		)
 		if err != nil {
@@ -212,7 +215,7 @@ func (s *OrderService) GetUndeliveredOrders() ([]entity.Order, error) {
 	query := `
 		SELECT a.id, a.user_id, a.drug_id, a.quantity, a.price, a.total_price,
 					a.payment_method, a.payment_status, a.payment_at, a.delivery_status, a.delivered_at,
-					a.created_at, a.updated_at, b.name user_name, c.name drug_name
+					a.created_at, a.updated_at, b.name user_name, b.email user_email, c.name drug_name
 		FROM orders a, users b, drugs c
 		WHERE a.user_id = b.id
 		AND a.drug_id = c.id
@@ -246,6 +249,7 @@ func (s *OrderService) GetUndeliveredOrders() ([]entity.Order, error) {
 			&order.CreatedAt,
 			&order.UpdatedAt,
 			&order.UserName,
+			&order.UserEmail,
 			&order.DrugName,
 		)
 		if err != nil {
