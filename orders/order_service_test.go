@@ -186,3 +186,29 @@ func TestOrderServicePayOrder_Success(t *testing.T) {
 
 	mockRepository.AssertExpectations(t)
 }
+
+func TestOrderServicePaidOrder_ValidationError(t *testing.T) {
+	order := entity.Order{
+		Id:            "123456",
+		UserId:        "111111",
+		DrugId:        "222222",
+		Quantity:      2,
+		Price:         1000,
+		TotalPrice:    2000,
+		PaymentMethod: "",
+	}
+
+	mockRepository := new(MockOrderRepository)
+
+	orderService := &OrderService{
+		orderRepository: mockRepository,
+	}
+
+	result, err := orderService.UpdateOrderPayment(order)
+
+	assert.NotNil(t, err)
+	assert.Equal(t, "payment method cannot be empty", err.Error())
+	assert.Nil(t, result)
+
+	mockRepository.AssertExpectations(t)
+}
