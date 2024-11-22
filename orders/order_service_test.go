@@ -90,3 +90,31 @@ func TestOrderServiceGetOneOrder_OrderNotFound(t *testing.T) {
 
 	mockRepository.AssertExpectations(t)
 }
+
+func TestOrderServiceCreateOrder_Success(t *testing.T) {
+	order := entity.Order{
+		Id:         "123456",
+		UserId:     "111111",
+		DrugId:     "222222",
+		Quantity:   2,
+		Price:      1000,
+		TotalPrice: 2000,
+	}
+
+	mockRepository := new(MockOrderRepository)
+
+	mockRepository.On("CreateOrder", order).Return(order, nil)
+
+	orderService := &OrderService{
+		orderRepository: mockRepository,
+	}
+
+	result, err := orderService.CreateOrder(order)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, result)
+	assert.Equal(t, order.Id, result.Id, "created order should have the same id")
+	assert.Equal(t, order.TotalPrice, result.TotalPrice, "created order should have the same total price")
+
+	mockRepository.AssertExpectations(t)
+}
