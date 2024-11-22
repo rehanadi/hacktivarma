@@ -1,6 +1,7 @@
 package orders
 
 import (
+	"fmt"
 	entity "hacktivarma/entities"
 	"testing"
 
@@ -66,4 +67,26 @@ func TestOrderServiceGetOneOrder_Success(t *testing.T) {
 	assert.Equal(t, &order, result, "result has to be order with user id '111111'")
 
 	mockRepo.AssertExpectations(t)
+}
+
+func TestOrderServiceGetOneOrder_OrderNotFound(t *testing.T) {
+	emptyOrder := entity.Order{}
+	mockRepository := new(MockOrderRepository)
+
+	mockRepository.On("FindById", "123456").Return(emptyOrder, fmt.Errorf("order not found"))
+
+	orderService := &OrderService{
+		orderRepository: mockRepository,
+	}
+
+	result, err := orderService.GetOneOrder("123456")
+
+	fmt.Println(result)
+	fmt.Println(err)
+
+	assert.NotNil(t, err)
+	assert.Equal(t, "order not found", err.Error())
+	assert.Nil(t, result)
+
+	mockRepository.AssertExpectations(t)
 }
