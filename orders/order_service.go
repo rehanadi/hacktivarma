@@ -273,6 +273,7 @@ func (s *OrderService) GetReportOrders() ([]entity.ReportOrder, error) {
 
 	query := `
 		SELECT date(a.created_at)::text date,
+					b.name drug_name,
 					count(a.id) total_order_all,
 					count(case when a.payment_status = 'unpaid' then 1 end) total_order_pending,
 					count(case when a.payment_status = 'paid' then 1 end) total_order_success,
@@ -281,9 +282,10 @@ func (s *OrderService) GetReportOrders() ([]entity.ReportOrder, error) {
 					coalesce(sum(case when a.payment_status = 'unpaid' then a.total_price end), 0) amount_order_pending,
 					coalesce(sum(case when a.payment_status = 'paid' then a.total_price end), 0) amount_order_success,
 					coalesce(sum(case when a.payment_status = 'failed' then a.total_price end), 0) amount_order_failed
-		FROM orders a
-		GROUP BY date(a.created_at)
-		ORDER BY date(a.created_at)
+		FROM orders a, drugs b
+		WHERE a.drug_id = b.id
+		GROUP BY date(a.created_at), b.name
+		ORDER BY date(a.created_at), b.name
 	`
 
 	rows, err := s.DB.Query(query)
@@ -296,6 +298,7 @@ func (s *OrderService) GetReportOrders() ([]entity.ReportOrder, error) {
 
 		err := rows.Scan(
 			&reportOrder.Date,
+			&reportOrder.DrugName,
 			&reportOrder.TotalOrderAll,
 			&reportOrder.TotalOrderPending,
 			&reportOrder.TotalOrderSuccess,
