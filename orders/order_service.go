@@ -23,7 +23,7 @@ func (s *OrderService) GetAllOrders(userId interface{}) ([]entity.Order, error) 
 	query := `
 		SELECT a.id, a.user_id, a.drug_id, a.quantity, a.price, a.total_price,
 					a.payment_method, a.payment_status, a.payment_at, a.delivery_status, a.delivered_at,
-					a.created_at, a.updated_at, b.name user_name, c.name drug_name
+					a.created_at, a.updated_at, b.name user_name, b.email user_email, c.name drug_name
 		FROM orders a, users b, drugs c
 		WHERE a.user_id = b.id
 		AND a.drug_id = c.id
@@ -60,6 +60,7 @@ func (s *OrderService) GetAllOrders(userId interface{}) ([]entity.Order, error) 
 			&order.CreatedAt,
 			&order.UpdatedAt,
 			&order.UserName,
+			&order.UserEmail,
 			&order.DrugName,
 		)
 		if err != nil {
@@ -88,7 +89,7 @@ func (s *OrderService) GetUnpaidOrders(userId string) ([]entity.Order, error) {
 	query := `
 		SELECT a.id, a.user_id, a.drug_id, a.quantity, a.price, a.total_price,
 					a.payment_method, a.payment_status, a.payment_at, a.delivery_status, a.delivered_at,
-					a.created_at, a.updated_at, b.name user_name, c.name drug_name
+					a.created_at, a.updated_at, b.name user_name, b.email user_email, c.name drug_name
 		FROM orders a, users b, drugs c
 		WHERE a.user_id = b.id
 		AND a.drug_id = c.id
@@ -122,6 +123,7 @@ func (s *OrderService) GetUnpaidOrders(userId string) ([]entity.Order, error) {
 			&order.CreatedAt,
 			&order.UpdatedAt,
 			&order.UserName,
+			&order.UserEmail,
 			&order.DrugName,
 		)
 		if err != nil {
@@ -150,7 +152,7 @@ func (s *OrderService) GetFailedOrders(userId string) ([]entity.Order, error) {
 	query := `
 		SELECT a.id, a.user_id, a.drug_id, a.quantity, a.price, a.total_price,
 					a.payment_method, a.payment_status, a.payment_at, a.delivery_status, a.delivered_at,
-					a.created_at, a.updated_at, b.name user_name, c.name drug_name
+					a.created_at, a.updated_at, b.name user_name, b.email user_email, c.name drug_name
 		FROM orders a, users b, drugs c
 		WHERE a.user_id = b.id
 		AND a.drug_id = c.id
@@ -184,6 +186,7 @@ func (s *OrderService) GetFailedOrders(userId string) ([]entity.Order, error) {
 			&order.CreatedAt,
 			&order.UpdatedAt,
 			&order.UserName,
+			&order.UserEmail,
 			&order.DrugName,
 		)
 		if err != nil {
@@ -212,7 +215,7 @@ func (s *OrderService) GetUndeliveredOrders() ([]entity.Order, error) {
 	query := `
 		SELECT a.id, a.user_id, a.drug_id, a.quantity, a.price, a.total_price,
 					a.payment_method, a.payment_status, a.payment_at, a.delivery_status, a.delivered_at,
-					a.created_at, a.updated_at, b.name user_name, c.name drug_name
+					a.created_at, a.updated_at, b.name user_name, b.email user_email, c.name drug_name
 		FROM orders a, users b, drugs c
 		WHERE a.user_id = b.id
 		AND a.drug_id = c.id
@@ -246,6 +249,7 @@ func (s *OrderService) GetUndeliveredOrders() ([]entity.Order, error) {
 			&order.CreatedAt,
 			&order.UpdatedAt,
 			&order.UserName,
+			&order.UserEmail,
 			&order.DrugName,
 		)
 		if err != nil {
@@ -273,6 +277,7 @@ func (s *OrderService) GetReportOrders() ([]entity.ReportOrder, error) {
 
 	query := `
 		SELECT date(a.created_at)::text date,
+					b.name drug_name,
 					count(a.id) total_order_all,
 					count(case when a.payment_status = 'unpaid' then 1 end) total_order_pending,
 					count(case when a.payment_status = 'paid' then 1 end) total_order_success,
@@ -281,9 +286,10 @@ func (s *OrderService) GetReportOrders() ([]entity.ReportOrder, error) {
 					coalesce(sum(case when a.payment_status = 'unpaid' then a.total_price end), 0) amount_order_pending,
 					coalesce(sum(case when a.payment_status = 'paid' then a.total_price end), 0) amount_order_success,
 					coalesce(sum(case when a.payment_status = 'failed' then a.total_price end), 0) amount_order_failed
-		FROM orders a
-		GROUP BY date(a.created_at)
-		ORDER BY date(a.created_at)
+		FROM orders a, drugs b
+		WHERE a.drug_id = b.id
+		GROUP BY date(a.created_at), b.name
+		ORDER BY date(a.created_at), b.name
 	`
 
 	rows, err := s.DB.Query(query)
@@ -296,6 +302,7 @@ func (s *OrderService) GetReportOrders() ([]entity.ReportOrder, error) {
 
 		err := rows.Scan(
 			&reportOrder.Date,
+			&reportOrder.DrugName,
 			&reportOrder.TotalOrderAll,
 			&reportOrder.TotalOrderPending,
 			&reportOrder.TotalOrderSuccess,

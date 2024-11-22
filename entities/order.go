@@ -19,11 +19,13 @@ type Order struct {
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 	UserName       string
+	UserEmail      string
 	DrugName       string
 }
 
 type ReportOrder struct {
 	Date               string
+	DrugName           string
 	TotalOrderAll      int
 	TotalOrderPending  int
 	TotalOrderSuccess  int
